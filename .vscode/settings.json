@@ -9,5 +9,13 @@
     "vue",
     "markdown",
     "astro"
-  ]
+  ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.turbo": true,
+    "**/.eslintcache": true,
+    "**/*.tsbuildinfo": true,
+    "**/packages/*/node_modules": true,
+    "**/packages/*/dist": true
+  }
 }
