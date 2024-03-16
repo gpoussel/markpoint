@@ -5,6 +5,7 @@
   "description": "",
   "author": "Guillaume POUSSEL",
   "type": "module",
+  "main": "packages/cli/dist/index.js",
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
