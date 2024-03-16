@@ -5,7 +5,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "dev": "tsc && tsc -w",
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "prettier -c . && eslint . --cache --max-warnings=0 && tsc --noEmit"
   },
   "dependencies": {
     "@markpoint/shared": "workspace:*"
