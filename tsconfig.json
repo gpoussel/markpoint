@@ -1,8 +1,4 @@
 {
   "extends": "@hideoo/tsconfig",
-  "compilerOptions": {
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "verbatimModuleSyntax": false
-  }
+  "compilerOptions": {}
 }

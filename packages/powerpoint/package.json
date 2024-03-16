@@ -1,5 +1,5 @@
 {
-  "name": "@markpoint/cli",
+  "name": "@markpoint/powerpoint",
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,10 +9,5 @@
     "build": "tsc -p tsconfig.build.json",
     "lint": "prettier -c . && eslint . --cache --max-warnings=0 && tsc --noEmit"
   },
-  "dependencies": {
-    "@markpoint/powerpoint": "workspace:*",
-    "@markpoint/shared": "workspace:*",
-    "cac": "^6.7.14"
-  },
-  "devDependencies": {}
+  "dependencies": {}
 }

@@ -38,9 +38,17 @@ importers:
 
   packages/cli:
     dependencies:
+      '@markpoint/powerpoint':
+        specifier: workspace:*
+        version: link:../powerpoint
       '@markpoint/shared':
         specifier: workspace:*
         version: link:../shared
+      cac:
+        specifier: ^6.7.14
+        version: 6.7.14
+
+  packages/powerpoint: {}
 
   packages/shared: {}
 
@@ -608,6 +616,11 @@ packages:
     resolution: {integrity: sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==}
     engines: {node: '>=6'}
     dev: true
+
+  /cac@6.7.14:
+    resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
+    engines: {node: '>=8'}
+    dev: false
 
   /call-bind@1.0.7:
     resolution: {integrity: sha512-GHTSNSYICQ7scH7sZ+M2rFopRoLh8t2bLSW6BbgrtLsahOIB5iyAVJf9GjWK3cYTDaMj4XdBpM1cA6pIS0Kv2w==}
