@@ -15,7 +15,10 @@
     "**/.turbo": true,
     "**/.eslintcache": true,
     "**/*.tsbuildinfo": true,
+    "**/packages/*/.prettierignore": true,
+    "**/packages/*/tsconfig*.json": true,
     "**/packages/*/node_modules": true,
-    "**/packages/*/dist": true
+    "**/packages/*/dist": true,
+    "pnpm-*.yaml": true
   }
 }
