@@ -1,0 +1,13 @@
+{
+  "name": "@markpoint/cli",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "tsc && tsc -w",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@markpoint/shared": "workspace:*"
+  }
+}

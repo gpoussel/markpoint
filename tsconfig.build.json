@@ -1,0 +1,7 @@
+{
+  "extends": "@hideoo/tsconfig",
+  "compilerOptions": {
+    "incremental": false,
+    "noEmit": false
+  }
+}
