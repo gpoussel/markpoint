@@ -10,6 +10,8 @@
     "lint": "prettier -c . && eslint . --cache --max-warnings=0 && tsc --noEmit"
   },
   "dependencies": {
+    "@xmldom/xmldom": "^0.8.10",
+    "jszip": "^3.10.1",
     "pptx-automizer": "^0.4.7"
   }
 }

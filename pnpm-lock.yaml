@@ -50,6 +50,12 @@ importers:
 
   packages/powerpoint:
     dependencies:
+      '@xmldom/xmldom':
+        specifier: ^0.8.10
+        version: 0.8.10
+      jszip:
+        specifier: ^3.10.1
+        version: 3.10.1
       pptx-automizer:
         specifier: ^0.4.7
         version: 0.4.7

@@ -10,7 +10,7 @@ async function analyze(path: string, outputPath: string | undefined) {
   if (outputPath) {
     await fs.writeFile(outputPath, JSON.stringify(template, undefined, 2), 'utf8')
   } else {
-    for (const masterSlide of template.masterSlides) {
+    for (const masterSlide of template.slides) {
       // eslint-disable-next-line no-console
       console.log(masterSlide)
     }
