@@ -9,6 +9,7 @@ import { getText, map } from './utils/xml-utils.js'
 
 export interface PowerpointSlideTextElement {
   id: string
+  creationId?: string | undefined
   name: string
   text?: string
 }
@@ -83,13 +84,16 @@ export class PowerpointReader {
   findTextElementsFromMasterFile(masterFileDocument: Document): PowerpointSlideTextElement[] {
     return map(masterFileDocument.getElementsByTagName('p:sp'), (shape) => {
       const shapeProperties = shape.getElementsByTagName('p:cNvPr')
-      if (shapeProperties.length === 1) {
-        const shapeName = shapeProperties[0]?.getAttribute('name')
-        const shapeId = shapeProperties[0]?.getAttribute('id')
+      if (shapeProperties.length === 1 && shapeProperties[0]) {
+        const shapeName = shapeProperties[0].getAttribute('name')
+        const shapeId = shapeProperties[0].getAttribute('id')
+
+        const creationId = shapeProperties[0].getElementsByTagName('a16:creationId')[0]?.getAttribute('id') ?? undefined
 
         if (shapeName && shapeId) {
           return {
             id: shapeId,
+            creationId,
             name: shapeName,
             text: getText(shape),
           }
