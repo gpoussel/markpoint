@@ -1,0 +1,14 @@
+diff --git a/dist/helper/xml-relationship-helper.js b/dist/helper/xml-relationship-helper.js
+index 96233bc3f40e54ead6072d2c9b146b3f6e546bbb..8d2c2b73200e93e73c91f0eef0b27405a9286303 100644
+--- a/dist/helper/xml-relationship-helper.js
++++ b/dist/helper/xml-relationship-helper.js
+@@ -101,7 +101,8 @@ class XmlRelationshipHelper {
+             for (const xmlTarget of this.xmlTargets) {
+                 const targetFile = xmlTarget.getAttribute('Target');
+                 const targetPath = targetFile.replace('../', 'ppt/');
+-                if (this.archive.fileExists(targetPath) === false) {
++                const targetMode = xmlTarget.getAttribute('TargetMode');
++                if (targetMode !== "External" && this.archive.fileExists(targetPath) === false) {
+                     if (check) {
+                         console.error('Related content from ' +
+                             sourceArchive.filename +

@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 
-import { PowerpointReader } from '@markpoint/powerpoint'
+import { PowerpointReader, PowerpointWriter } from '@markpoint/powerpoint'
 import { cac } from 'cac'
 
 async function analyze(path: string, outputPath: string | undefined) {
@@ -17,6 +17,11 @@ async function analyze(path: string, outputPath: string | undefined) {
   }
 }
 
+async function sampleGeneration(templatePath: string, outputPath: string) {
+  const writer = new PowerpointWriter()
+  await writer.generate(templatePath, outputPath)
+}
+
 async function main() {
   const cli = cac('markpoint-cli')
 
@@ -25,6 +30,11 @@ async function main() {
     .option('--output <outputFile>', 'output YAML file')
     .action(async (file: string, options: { output: string | undefined }) => {
       await analyze(file, options.output)
+    })
+  cli
+    .command('demo <templateFile> <outputFile>', 'demonstrate capabilities of Powerpoint generation')
+    .action(async (templateFile: string, outputFile: string) => {
+      await sampleGeneration(templateFile, outputFile)
     })
   cli.help()
   cli.parse(process.argv, { run: false })

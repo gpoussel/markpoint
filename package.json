@@ -42,5 +42,10 @@
       "prettier -w -u --cache",
       "eslint --cache --no-warn-ignored --max-warnings=0"
     ]
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "pptx-automizer@0.4.7": "patches/pptx-automizer@0.4.7.patch"
+    }
   }
 }
