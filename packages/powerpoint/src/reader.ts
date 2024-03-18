@@ -22,7 +22,23 @@ export interface PowerpointSlide {
 
 export interface PowerpointMasterTemplate {
   masterTextElements: PowerpointSlideTextElement[]
+  layoutSlides: PowerpointLayoutSlide[]
   slides: PowerpointSlide[]
+}
+
+export interface PowerpointLayoutSlide {
+  name: string
+  number: number
+}
+
+const DOM_PARSER = new DOMParser()
+async function readFile(jsZip: JSZip, path: string): Promise<Document> {
+  const file = jsZip.files[path]
+  if (!file) {
+    throw new Error(`Unable to find file in archive (${path})`)
+  }
+  const content = await file.async('text')
+  return DOM_PARSER.parseFromString(content)
 }
 
 export class PowerpointReader {
@@ -37,8 +53,10 @@ export class PowerpointReader {
     const pres = automizer.loadRoot(path.basename(templatePath)).load(path.basename(templatePath), templateName)
     const mainTemplate = pres.getTemplate(templateName)
     const jsZip = await pres.getJSZip()
+    const masterFile = await readFile(jsZip, 'ppt/slideMasters/slideMaster1.xml')
     return {
-      masterTextElements: await this.readTextElementsFromMasterFile(jsZip),
+      masterTextElements: this.findTextElementsFromMasterFile(masterFile),
+      layoutSlides: await this.readLayoutSlides(jsZip, masterFile),
       slides: await this.readSlides(mainTemplate),
     }
   }
@@ -62,15 +80,8 @@ export class PowerpointReader {
     })
   }
 
-  async readTextElementsFromMasterFile(jsZip: JSZip): Promise<PowerpointSlideTextElement[]> {
-    const masterFile = jsZip.files['ppt/slideMasters/slideMaster1.xml']
-    if (!masterFile) {
-      return []
-    }
-    const masterContent = await masterFile.async('text')
-    const domParser = new DOMParser()
-    const document = domParser.parseFromString(masterContent)
-    return map(document.getElementsByTagName('p:sp'), (shape) => {
+  findTextElementsFromMasterFile(masterFileDocument: Document): PowerpointSlideTextElement[] {
+    return map(masterFileDocument.getElementsByTagName('p:sp'), (shape) => {
       const shapeProperties = shape.getElementsByTagName('p:cNvPr')
       if (shapeProperties.length === 1) {
         const shapeName = shapeProperties[0]?.getAttribute('name')
@@ -86,5 +97,32 @@ export class PowerpointReader {
       }
       return undefined
     })
+  }
+
+  async readLayoutSlides(jsZip: JSZip, masterFileDocument: Document): Promise<PowerpointLayoutSlide[]> {
+    const layoutRefIds = map(masterFileDocument.getElementsByTagName('p:sldLayoutId'), (layoutId) => {
+      return layoutId.getAttribute('r:id')
+    })
+    const masterRefDocument = await readFile(jsZip, 'ppt/slideMasters/_rels/slideMaster1.xml.rels')
+    const masterRefMapping = map(masterRefDocument.getElementsByTagName('Relationship'), (relationship) => {
+      const id = relationship.getAttribute('Id')
+      const layoutFile = relationship.getAttribute('Target')?.replace('../', 'ppt/')
+      return {
+        id,
+        layoutFile,
+      }
+    })
+    const result = await Promise.all(
+      layoutRefIds.map(async (refId) => {
+        const layoutFilePath = masterRefMapping.find((mapping) => mapping.id === refId)?.layoutFile
+        if (!layoutFilePath) {
+          return
+        }
+        const layoutFile = await readFile(jsZip, layoutFilePath)
+        const nameTag = layoutFile.getElementsByTagName('p:cSld')
+        return nameTag[0]?.getAttribute('name')
+      }),
+    )
+    return result.filter((item): item is string => !!item).map((name, i) => ({ name, number: i + 1 }))
   }
 }
