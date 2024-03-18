@@ -5,6 +5,8 @@ import type JSZip from 'jszip'
 import { Automizer } from 'pptx-automizer'
 import type { PresTemplate } from 'pptx-automizer/dist/interfaces/pres-template'
 
+import { getText, map } from './utils/xml-utils.js'
+
 export interface PowerpointSlideTextElement {
   id: string
   name: string
@@ -68,50 +70,21 @@ export class PowerpointReader {
     const masterContent = await masterFile.async('text')
     const domParser = new DOMParser()
     const document = domParser.parseFromString(masterContent)
-    const shapes = document.getElementsByTagName('p:sp')
-    const textElements: PowerpointSlideTextElement[] = []
-    for (let i = 0; i < shapes.length; ++i) {
-      const shape = shapes.item(i)
-      if (!shape) {
-        continue
-      }
+    return map(document.getElementsByTagName('p:sp'), (shape) => {
       const shapeProperties = shape.getElementsByTagName('p:cNvPr')
-      if (shapeProperties.length !== 1) {
-        continue
-      }
-      const shapeName = shapeProperties[0]?.getAttribute('name')
-      const shapeId = shapeProperties[0]?.getAttribute('id')
+      if (shapeProperties.length === 1) {
+        const shapeName = shapeProperties[0]?.getAttribute('name')
+        const shapeId = shapeProperties[0]?.getAttribute('id')
 
-      if (shapeName && shapeId) {
-        textElements.push({
-          id: shapeId,
-          name: shapeName,
-          text: this.getText(shape),
-        })
-      }
-    }
-    return textElements
-  }
-
-  getText(shape: Element): string {
-    const textLines = []
-    const paragraphs = shape.getElementsByTagName('a:p')
-    for (let i = 0; i < paragraphs.length; ++i) {
-      const paragraph = paragraphs.item(i)
-      if (!paragraph) {
-        continue
-      }
-      const textElements = paragraph.getElementsByTagName('a:t')
-      const texts: string[] = []
-      for (let j = 0; j < textElements.length; ++j) {
-        const textElement = textElements.item(j)
-        if (!textElement?.textContent) {
-          continue
+        if (shapeName && shapeId) {
+          return {
+            id: shapeId,
+            name: shapeName,
+            text: getText(shape),
+          }
         }
-        texts.push(textElement.textContent.trim())
       }
-      textLines.push(texts.join(' '))
-    }
-    return textLines.join('\n')
+      return undefined
+    })
   }
 }
