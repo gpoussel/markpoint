@@ -87,7 +87,44 @@ async function sampleGeneration(templatePath: string, outputPath: string) {
                 },
                 {
                   creationId: '{0984FDF1-E23B-9E8F-73B5-6BF495603FA0}',
-                  content: 'Unformatted content',
+                  content: [
+                    {
+                      text: `Outside bullet – Section ${sectionNb} – Page ${subsectionNb}`,
+                      level: 0,
+                    },
+                    {
+                      text: 'First bullet 1',
+                      level: 1,
+                    },
+                    {
+                      text: 'Inside bullet 1',
+                      level: 2,
+                    },
+                    {
+                      text: 'Again bullet 1',
+                      level: 3,
+                    },
+                    {
+                      text: 'Final bullet 1',
+                      level: 4,
+                    },
+                    {
+                      text: 'Again bullet 2',
+                      level: 3,
+                    },
+                    {
+                      text: 'Inside bullet 2',
+                      level: 2,
+                    },
+                    {
+                      text: 'First bullet 2',
+                      level: 1,
+                    },
+                    {
+                      text: 'Last paragraph',
+                      level: 0,
+                    },
+                  ],
                 },
               ],
             })),

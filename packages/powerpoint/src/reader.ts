@@ -5,74 +5,15 @@ import type JSZip from 'jszip'
 import { Automizer } from 'pptx-automizer'
 import type { PresTemplate } from 'pptx-automizer/dist/interfaces/pres-template'
 
+import {
+  ELEMENT_TAG_NAMES,
+  XML_FILE_NAMES,
+  ATTRIBUTE_NAMES,
+  SLIDE_ELEMENT_TYPES,
+  EMU_PER_CENTIMETER,
+} from './opendocument.js'
+import type { PowerpointSlideTextElement, PowerpointMasterTemplate, PowerpointLayoutSlide } from './types.js'
 import { getText, map } from './utils/xml-utils.js'
-
-const ELEMENT_TAG_NAMES = {
-  creationId: 'a16:creationId',
-  nonVisualDrawingProperties: 'p:cNvPr',
-  relationships: 'Relationship',
-  shape: 'p:sp',
-  slide: 'p:cSld',
-  slideLayoutId: 'p:sldLayoutId',
-}
-
-const XML_FILE_NAMES = {
-  master1: 'ppt/slideMasters/slideMaster1.xml',
-  master1Relationships: 'ppt/slideMasters/_rels/slideMaster1.xml.rels',
-}
-
-const ATTRIBUTE_NAMES = {
-  creationIdId: 'id',
-  id: 'Id',
-  slideLayoutIdId: 'r:id',
-  slideName: 'name',
-  relationshipId: 'Id',
-  relationshipTarget: 'Target',
-  shapePropertiesId: 'id',
-  shapePropertiesName: 'name',
-}
-
-const SLIDE_ELEMENT_TYPES = {
-  shape: 'sp',
-  picture: 'pic',
-}
-
-export interface PowerpointSlideTextElement {
-  id: string
-  creationId?: string | undefined
-  name: string
-  text?: string
-}
-
-export interface PowerpointSlidePictureElement {
-  id: string
-  name: string
-  x: number
-  y: number
-  width: number
-  height: number
-}
-
-export interface PowerpointSlide {
-  id: number
-  number: number
-  name: string
-  textElements: PowerpointSlideTextElement[]
-  pictures: PowerpointSlidePictureElement[]
-}
-
-export interface PowerpointMasterTemplate {
-  masterTextElements: PowerpointSlideTextElement[]
-  layoutSlides: PowerpointLayoutSlide[]
-  slides: PowerpointSlide[]
-}
-
-export interface PowerpointLayoutSlide {
-  name: string
-  number: number
-}
-
-const EMU_PER_CENTIMETER = 360_000
 
 const DOM_PARSER = new DOMParser()
 async function readFile(jsZip: JSZip, path: string): Promise<Document> {

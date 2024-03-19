@@ -1,9 +1,28 @@
+/* eslint-disable unicorn/prefer-dom-node-append */
 import { copyFile, rm } from 'node:fs/promises'
 import path from 'node:path'
 
 import PPTX, { type Presentation } from 'nodejs-pptx'
-import { Automizer, ModifyImageHelper, ModifyTextHelper, type XmlElement } from 'pptx-automizer'
+import {
+  Automizer,
+  ModifyImageHelper,
+  ModifyTextHelper,
+  type IMaster,
+  type XmlElement,
+  type ISlide,
+} from 'pptx-automizer'
 import { withDir } from 'tmp-promise'
+
+import { ATTRIBUTE_NAMES, ELEMENT_TAG_NAMES } from './opendocument.js'
+import type {
+  PowerpointGenerationSlideConfiguration,
+  PowerpointGenerationTextPlaceholder,
+  PowerpointGenerationImagePlaceholder,
+  PowerpointGenerationMetadata,
+  PowerpointGenerationConfiguration,
+  PowerpointGenerationTextLines,
+} from './types.js'
+import { removeAllChild } from './utils/xml-utils.js'
 
 const pptx = new PPTX.Composer()
 
@@ -11,35 +30,6 @@ const EMPTY_FILENAME = 'Empty.pptx'
 const TEMPLATE_FILENAME = 'Template.pptx'
 const TEMPLATE_LABEL = 'template'
 const OUTPUT_FILENAME = 'Output.pptx'
-
-export interface PowerpointGenerationSlideConfiguration {
-  copyOnSlide: number
-  texts?: PowerpointGenerationTextPlaceholder[]
-  pictures?: PowerpointGenerationImagePlaceholder[]
-}
-
-export interface PowerpointGenerationTextPlaceholder {
-  creationId: string
-  content: string
-}
-
-export interface PowerpointGenerationImagePlaceholder {
-  creationId: string
-  path: string
-}
-
-export interface PowerpointGenerationMetadata {
-  title: string
-  author: string
-  company: string
-  subject: string
-}
-
-export interface PowerpointGenerationConfiguration {
-  metadata: PowerpointGenerationMetadata
-  masterTexts: PowerpointGenerationTextPlaceholder[]
-  slides: PowerpointGenerationSlideConfiguration[]
-}
 
 export class PowerpointWriter {
   async generate(
@@ -106,6 +96,64 @@ export class PowerpointWriter {
     await pptx.save(outputPath)
   }
 
+  private applyTextChanges(textPlaceholders: PowerpointGenerationTextPlaceholder[], slide: IMaster | ISlide) {
+    for (const masterText of textPlaceholders) {
+      if (typeof masterText.content === 'string') {
+        slide.modifyElement(
+          { creationId: masterText.creationId, name: masterText.creationId },
+          ModifyTextHelper.setText(masterText.content),
+        )
+      } else {
+        slide.modifyElement(
+          { creationId: masterText.creationId, name: masterText.creationId },
+          (element: XmlElement) => {
+            const textBodies = element.getElementsByTagName(ELEMENT_TAG_NAMES.shapeTextBody)
+            if (textBodies.length === 1) {
+              const textBody = textBodies[0] as Element
+              removeAllChild(textBody, ELEMENT_TAG_NAMES.paragraph)
+              for (const newParagraphConfig of masterText.content as PowerpointGenerationTextLines) {
+                const newParagraph = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.paragraph)
+                if (newParagraphConfig.level > 0) {
+                  const paragraphProperties = textBody.ownerDocument.createElement(
+                    ELEMENT_TAG_NAMES.paragraphProperties,
+                  )
+                  paragraphProperties.setAttribute(ATTRIBUTE_NAMES.level, newParagraphConfig.level.toString())
+                  newParagraph.appendChild(paragraphProperties)
+                }
+                const newRange = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.range)
+                const newRangeProperties = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.rangeProperties)
+                newRangeProperties.setAttribute(ATTRIBUTE_NAMES.lang, 'en-US')
+                newRangeProperties.setAttribute(ATTRIBUTE_NAMES.dirty, '0')
+                newRange.appendChild(newRangeProperties)
+                const newText = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.text)
+                newText.textContent = newParagraphConfig.text
+                newRange.appendChild(newText)
+                newParagraph.appendChild(newRange)
+                textBody.appendChild(newParagraph)
+              }
+            }
+          },
+        )
+      }
+    }
+  }
+
+  private applyImageChanges(
+    imagePlaceholders: PowerpointGenerationImagePlaceholder[],
+    imagePaths: Record<string, string>,
+    slide: IMaster | ISlide,
+  ) {
+    for (const pictureConfiguration of imagePlaceholders) {
+      slide.modifyElement(
+        { creationId: pictureConfiguration.creationId, name: pictureConfiguration.creationId },
+        ModifyImageHelper.setRelationTarget(imagePaths[pictureConfiguration.path] as string) as (
+          element: XmlElement | undefined,
+          arg1: XmlElement | undefined,
+        ) => void,
+      )
+    }
+  }
+
   private generatePresentation(
     automizer: Automizer,
     configuration: PowerpointGenerationConfiguration,
@@ -116,33 +164,15 @@ export class PowerpointWriter {
       presentation.loadMedia(name)
     }
     presentation.addMaster(TEMPLATE_LABEL, 1, (master) => {
-      for (const masterText of configuration.masterTexts) {
-        master.modifyElement(
-          { creationId: masterText.creationId, name: masterText.creationId },
-          ModifyTextHelper.setText(masterText.content),
-        )
-      }
+      this.applyTextChanges(configuration.masterTexts, master)
     })
     for (const slideConfiguration of configuration.slides) {
       presentation.addSlide(TEMPLATE_LABEL, slideConfiguration.copyOnSlide, (slide) => {
         if (slideConfiguration.texts) {
-          for (const textConfiguration of slideConfiguration.texts) {
-            slide.modifyElement(
-              { creationId: textConfiguration.creationId, name: textConfiguration.creationId },
-              ModifyTextHelper.setText(textConfiguration.content),
-            )
-          }
+          this.applyTextChanges(slideConfiguration.texts, slide)
         }
         if (slideConfiguration.pictures) {
-          for (const pictureConfiguration of slideConfiguration.pictures) {
-            slide.modifyElement(
-              { creationId: pictureConfiguration.creationId, name: pictureConfiguration.creationId },
-              ModifyImageHelper.setRelationTarget(imagePaths[pictureConfiguration.path] as string) as (
-                element: XmlElement | undefined,
-                arg1: XmlElement | undefined,
-              ) => void,
-            )
-          }
+          this.applyImageChanges(slideConfiguration.pictures, imagePaths, slide)
         }
       })
     }

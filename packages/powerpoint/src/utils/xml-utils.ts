@@ -19,6 +19,15 @@ export function map<T extends Element, V>(collection: HTMLCollectionOf<T>, callb
   return result
 }
 
+export function removeAllChild(parentNode: Element, tagName: string) {
+  let elements = parentNode.getElementsByTagName(tagName)
+  while (elements.length > 0) {
+    // eslint-disable-next-line unicorn/prefer-dom-node-remove
+    parentNode.removeChild(elements[0] as Element)
+    elements = parentNode.getElementsByTagName(tagName)
+  }
+}
+
 /**
  * Returns the text of an element (e.g. a shape)
  * @param element Element to get text from
