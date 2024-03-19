@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises'
+import path from 'node:path'
 
 import { PowerpointReader, PowerpointWriter } from '@markpoint/powerpoint'
 import { cac } from 'cac'
@@ -64,6 +65,12 @@ async function sampleGeneration(templatePath: string, outputPath: string) {
                 {
                   creationId: '{4F2608E1-5E03-2C7E-434E-5BF07E81F24A}',
                   content: `Section ${nb} subtitle`,
+                },
+              ],
+              pictures: [
+                {
+                  creationId: '{7B4224E4-95EA-4DE2-B734-333DC4BF7A4F}',
+                  path: path.join('__fixtures__', '3385x1905.png'),
                 },
               ],
             },

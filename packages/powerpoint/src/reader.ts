@@ -32,6 +32,11 @@ const ATTRIBUTE_NAMES = {
   shapePropertiesName: 'name',
 }
 
+const SLIDE_ELEMENT_TYPES = {
+  shape: 'sp',
+  picture: 'pic',
+}
+
 export interface PowerpointSlideTextElement {
   id: string
   creationId?: string | undefined
@@ -39,11 +44,21 @@ export interface PowerpointSlideTextElement {
   text?: string
 }
 
+export interface PowerpointSlidePictureElement {
+  id: string
+  name: string
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
 export interface PowerpointSlide {
   id: number
   number: number
   name: string
   textElements: PowerpointSlideTextElement[]
+  pictures: PowerpointSlidePictureElement[]
 }
 
 export interface PowerpointMasterTemplate {
@@ -56,6 +71,8 @@ export interface PowerpointLayoutSlide {
   name: string
   number: number
 }
+
+const EMU_PER_CENTIMETER = 360_000
 
 const DOM_PARSER = new DOMParser()
 async function readFile(jsZip: JSZip, path: string): Promise<Document> {
@@ -95,11 +112,23 @@ export class PowerpointReader {
         number: slideId.number,
         name: slideId.info.name,
         textElements: slideId.elements
-          .filter((e) => e.type === 'sp' && e.hasTextBody)
+          .filter((e) => e.type === SLIDE_ELEMENT_TYPES.shape && e.hasTextBody)
           .map((element) => {
             return {
               id: element.id,
               name: element.name,
+            }
+          }),
+        pictures: slideId.elements
+          .filter((e) => e.type === SLIDE_ELEMENT_TYPES.picture)
+          .map((element) => {
+            return {
+              id: element.id,
+              name: element.name,
+              x: element.position.x / EMU_PER_CENTIMETER,
+              y: element.position.y / EMU_PER_CENTIMETER,
+              width: element.position.cx / EMU_PER_CENTIMETER,
+              height: element.position.cy / EMU_PER_CENTIMETER,
             }
           }),
       }

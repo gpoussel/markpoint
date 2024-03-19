@@ -2,7 +2,7 @@ import { copyFile, rm } from 'node:fs/promises'
 import path from 'node:path'
 
 import PPTX, { type Presentation } from 'nodejs-pptx'
-import { Automizer, ModifyTextHelper } from 'pptx-automizer'
+import { Automizer, ModifyImageHelper, ModifyTextHelper, type XmlElement } from 'pptx-automizer'
 import { withDir } from 'tmp-promise'
 
 const pptx = new PPTX.Composer()
@@ -15,11 +15,17 @@ const OUTPUT_FILENAME = 'Output.pptx'
 export interface PowerpointGenerationSlideConfiguration {
   copyOnSlide: number
   texts?: PowerpointGenerationTextPlaceholder[]
+  pictures?: PowerpointGenerationImagelaceholder[]
 }
 
 export interface PowerpointGenerationTextPlaceholder {
   creationId: string
   content: string
+}
+
+export interface PowerpointGenerationImagelaceholder {
+  creationId: string
+  path: string
 }
 
 export interface PowerpointGenerationMetadata {
@@ -49,6 +55,8 @@ export class PowerpointWriter {
           outputDir: workingDirectory,
           removeExistingSlides: true,
           autoImportSlideMasters: true,
+          cleanup: true,
+          compression: 9,
         })
 
         const temlateWorkingPath = path.join(workingDirectory, TEMPLATE_FILENAME)
@@ -74,6 +82,20 @@ export class PowerpointWriter {
                 slide.modifyElement(
                   { creationId: textConfiguration.creationId, name: textConfiguration.creationId },
                   ModifyTextHelper.setText(textConfiguration.content),
+                )
+              }
+            }
+            if (slideConfiguration.pictures) {
+              for (const pictureConfiguration of slideConfiguration.pictures) {
+                const imageFolder = path.dirname(pictureConfiguration.path)
+                const imageName = path.basename(pictureConfiguration.path)
+                presentation.loadMedia(imageName, imageFolder)
+                slide.modifyElement(
+                  { creationId: pictureConfiguration.creationId, name: pictureConfiguration.creationId },
+                  ModifyImageHelper.setRelationTarget(imageName) as (
+                    element: XmlElement | undefined,
+                    arg1: XmlElement | undefined,
+                  ) => void,
                 )
               }
             }
