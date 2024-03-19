@@ -5,9 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  pptx-automizer@0.4.7:
+  pptx-automizer@0.4.8:
     hash: imm2o5xfctiwggwx7tvhju4fd4
-    path: patches/pptx-automizer@0.4.7.patch
+    path: patches/pptx-automizer@0.4.8.patch
 
 importers:
 
@@ -65,8 +65,8 @@ importers:
         specifier: ^1.2.4
         version: 1.2.4
       pptx-automizer:
-        specifier: ^0.4.7
-        version: 0.4.7(patch_hash=imm2o5xfctiwggwx7tvhju4fd4)
+        specifier: ^0.4.8
+        version: 0.4.8(patch_hash=imm2o5xfctiwggwx7tvhju4fd4)
       tmp-promise:
         specifier: ^3.0.3
         version: 3.0.3
@@ -2701,8 +2701,8 @@ packages:
       uuid: 8.3.2
     dev: false
 
-  /pptx-automizer@0.4.7(patch_hash=imm2o5xfctiwggwx7tvhju4fd4):
-    resolution: {integrity: sha512-dKm6VjE3VcYQzMKaobu5jEvVTcYA718xfxqGaUEZSKe3QVxFamf6kiYKr4qcUPGIBIOj4z+M3DVEYYgDbbaz8A==}
+  /pptx-automizer@0.4.8(patch_hash=imm2o5xfctiwggwx7tvhju4fd4):
+    resolution: {integrity: sha512-TvK2diiVYAp4MpVuoWvKD5+VPxcZiup+ht86RPj1gMlF1+0eYQrwntaZThSi7c1RXYm6o02DWg61PaeTSeGVIA==}
     dependencies:
       '@xmldom/xmldom': 0.8.10
       extract-zip: 2.0.1

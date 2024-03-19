@@ -13,7 +13,7 @@
     "@xmldom/xmldom": "^0.8.10",
     "jszip": "^3.10.1",
     "nodejs-pptx": "^1.2.4",
-    "pptx-automizer": "^0.4.7",
+    "pptx-automizer": "^0.4.8",
     "tmp-promise": "^3.0.3"
   }
 }

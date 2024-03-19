@@ -45,7 +45,7 @@
   },
   "pnpm": {
     "patchedDependencies": {
-      "pptx-automizer@0.4.7": "patches/pptx-automizer@0.4.7.patch"
+      "pptx-automizer@0.4.8": "patches/pptx-automizer@0.4.8.patch"
     }
   }
 }
