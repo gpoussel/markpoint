@@ -117,6 +117,7 @@ export class PowerpointReader {
             return {
               id: element.id,
               name: element.name,
+              text: getText(element.getXmlElement()),
             }
           }),
         pictures: slideId.elements

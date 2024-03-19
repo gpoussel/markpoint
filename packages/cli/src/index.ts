@@ -53,18 +53,18 @@ async function sampleGeneration(templatePath: string, outputPath: string) {
             },
           ],
         },
-        ...[1, 2].flatMap((nb) => {
+        ...[1, 2].flatMap((sectionNb) => {
           return [
             {
               copyOnSlide: 24,
               texts: [
                 {
                   creationId: '{05383CED-A871-D722-5C38-FDB6D14AA784}',
-                  content: `Section ${nb}`,
+                  content: `Section ${sectionNb}`,
                 },
                 {
                   creationId: '{4F2608E1-5E03-2C7E-434E-5BF07E81F24A}',
-                  content: `Section ${nb} subtitle`,
+                  content: `Section ${sectionNb} subtitle`,
                 },
               ],
               pictures: [
@@ -74,12 +74,23 @@ async function sampleGeneration(templatePath: string, outputPath: string) {
                 },
               ],
             },
-            {
+            ...[1, 2].map((subsectionNb) => ({
               copyOnSlide: 21,
-            },
-            {
-              copyOnSlide: 21,
-            },
+              texts: [
+                {
+                  creationId: '{4582957B-1559-50B8-87D1-3F29F9DD12B2}',
+                  content: `Section ${sectionNb} – Page ${subsectionNb}`,
+                },
+                {
+                  creationId: '{28862325-59A6-26E6-FB10-93F6B61575F0}',
+                  content: `Subtitle of subsection ${subsectionNb}`,
+                },
+                {
+                  creationId: '{0984FDF1-E23B-9E8F-73B5-6BF495603FA0}',
+                  content: 'Unformatted content',
+                },
+              ],
+            })),
           ]
         }),
         {

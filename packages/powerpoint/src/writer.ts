@@ -15,7 +15,7 @@ const OUTPUT_FILENAME = 'Output.pptx'
 export interface PowerpointGenerationSlideConfiguration {
   copyOnSlide: number
   texts?: PowerpointGenerationTextPlaceholder[]
-  pictures?: PowerpointGenerationImagelaceholder[]
+  pictures?: PowerpointGenerationImagePlaceholder[]
 }
 
 export interface PowerpointGenerationTextPlaceholder {
@@ -23,7 +23,7 @@ export interface PowerpointGenerationTextPlaceholder {
   content: string
 }
 
-export interface PowerpointGenerationImagelaceholder {
+export interface PowerpointGenerationImagePlaceholder {
   creationId: string
   path: string
 }
@@ -53,6 +53,7 @@ export class PowerpointWriter {
         const automizer = new Automizer({
           templateDir: workingDirectory,
           outputDir: workingDirectory,
+          mediaDir: workingDirectory,
           removeExistingSlides: true,
           autoImportSlideMasters: true,
           cleanup: true,
@@ -65,43 +66,9 @@ export class PowerpointWriter {
         await copyFile(templatePath, temlateWorkingPath)
 
         await this.generateEmptyPresentation(stubWorkingPath, configuration.metadata)
-
-        const presentation = automizer.loadRoot(EMPTY_FILENAME).load(TEMPLATE_FILENAME, TEMPLATE_LABEL)
-        presentation.addMaster(TEMPLATE_LABEL, 1, (master) => {
-          for (const masterText of configuration.masterTexts) {
-            master.modifyElement(
-              { creationId: masterText.creationId, name: masterText.creationId },
-              ModifyTextHelper.setText(masterText.content),
-            )
-          }
-        })
-        for (const slideConfiguration of configuration.slides) {
-          presentation.addSlide(TEMPLATE_LABEL, slideConfiguration.copyOnSlide, (slide) => {
-            if (slideConfiguration.texts) {
-              for (const textConfiguration of slideConfiguration.texts) {
-                slide.modifyElement(
-                  { creationId: textConfiguration.creationId, name: textConfiguration.creationId },
-                  ModifyTextHelper.setText(textConfiguration.content),
-                )
-              }
-            }
-            if (slideConfiguration.pictures) {
-              for (const pictureConfiguration of slideConfiguration.pictures) {
-                const imageFolder = path.dirname(pictureConfiguration.path)
-                const imageName = path.basename(pictureConfiguration.path)
-                presentation.loadMedia(imageName, imageFolder)
-                slide.modifyElement(
-                  { creationId: pictureConfiguration.creationId, name: pictureConfiguration.creationId },
-                  ModifyImageHelper.setRelationTarget(imageName) as (
-                    element: XmlElement | undefined,
-                    arg1: XmlElement | undefined,
-                  ) => void,
-                )
-              }
-            }
-          })
-        }
-        await presentation.write(OUTPUT_FILENAME)
+        const imagePaths = await this.buildImagePaths(configuration.slides, workingDirectory)
+        this.generatePresentation(automizer, configuration, imagePaths)
+        await automizer.write(OUTPUT_FILENAME)
 
         await copyFile(outputWorkingPath, outPath)
         await rm(outputWorkingPath)
@@ -114,11 +81,70 @@ export class PowerpointWriter {
     )
   }
 
+  private async buildImagePaths(slides: PowerpointGenerationSlideConfiguration[], workingDirectory: string) {
+    const imageOriginalPaths = slides
+      .flatMap((slide) => slide.pictures ?? [])
+      .map((image) => image.path)
+      .filter((value, index, array) => array.indexOf(value) === index)
+
+    return Object.fromEntries(
+      await Promise.all(
+        imageOriginalPaths.map(async (image) => {
+          const imageNameInWorkingDirectory = path.basename(image)
+          await copyFile(image, path.join(workingDirectory, imageNameInWorkingDirectory))
+          return [image, imageNameInWorkingDirectory]
+        }),
+      ),
+    ) as Record<string, string>
+  }
+
   private async generateEmptyPresentation(outputPath: string, metadata: PowerpointGenerationMetadata) {
     await pptx.compose(async (pres: Presentation) => {
       pres.title(metadata.title).author(metadata.author).company(metadata.company).subject(metadata.subject)
       await pres.layout('LAYOUT_WIDE').addSlide()
     })
     await pptx.save(outputPath)
+  }
+
+  private generatePresentation(
+    automizer: Automizer,
+    configuration: PowerpointGenerationConfiguration,
+    imagePaths: Record<string, string>,
+  ) {
+    const presentation = automizer.loadRoot(EMPTY_FILENAME).load(TEMPLATE_FILENAME, TEMPLATE_LABEL)
+    for (const name of Object.values(imagePaths)) {
+      presentation.loadMedia(name)
+    }
+    presentation.addMaster(TEMPLATE_LABEL, 1, (master) => {
+      for (const masterText of configuration.masterTexts) {
+        master.modifyElement(
+          { creationId: masterText.creationId, name: masterText.creationId },
+          ModifyTextHelper.setText(masterText.content),
+        )
+      }
+    })
+    for (const slideConfiguration of configuration.slides) {
+      presentation.addSlide(TEMPLATE_LABEL, slideConfiguration.copyOnSlide, (slide) => {
+        if (slideConfiguration.texts) {
+          for (const textConfiguration of slideConfiguration.texts) {
+            slide.modifyElement(
+              { creationId: textConfiguration.creationId, name: textConfiguration.creationId },
+              ModifyTextHelper.setText(textConfiguration.content),
+            )
+          }
+        }
+        if (slideConfiguration.pictures) {
+          for (const pictureConfiguration of slideConfiguration.pictures) {
+            slide.modifyElement(
+              { creationId: pictureConfiguration.creationId, name: pictureConfiguration.creationId },
+              ModifyImageHelper.setRelationTarget(imagePaths[pictureConfiguration.path] as string) as (
+                element: XmlElement | undefined,
+                arg1: XmlElement | undefined,
+              ) => void,
+            )
+          }
+        }
+      })
+    }
   }
 }
