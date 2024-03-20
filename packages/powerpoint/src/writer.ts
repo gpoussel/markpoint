@@ -13,15 +13,16 @@ import {
 } from 'pptx-automizer'
 import { withDir } from 'tmp-promise'
 
-import { ATTRIBUTE_NAMES, ELEMENT_TAG_NAMES } from './opendocument.js'
 import type {
-  PowerpointGenerationSlideConfiguration,
-  PowerpointGenerationTextPlaceholder,
-  PowerpointGenerationImagePlaceholder,
-  PowerpointGenerationMetadata,
   PowerpointGenerationConfiguration,
-  PowerpointGenerationTextLines,
-} from './types.js'
+  PowerpointListItem,
+  PowerpointPartDefinition,
+  PowerpointPicturePartContent,
+  PowerpointPresentationDefinition,
+  PowerpointTemplatePart,
+  PresentationMetadata,
+} from './generation/configuration.js'
+import { ATTRIBUTE_NAMES, ELEMENT_TAG_NAMES } from './opendocument.js'
 import { removeAllChild } from './utils/xml-utils.js'
 
 const pptx = new PPTX.Composer()
@@ -30,6 +31,34 @@ const EMPTY_FILENAME = 'Empty.pptx'
 const TEMPLATE_FILENAME = 'Template.pptx'
 const TEMPLATE_LABEL = 'template'
 const OUTPUT_FILENAME = 'Output.pptx'
+
+const updateTextList = (items: PowerpointListItem[]) => {
+  return (element: XmlElement) => {
+    const textBodies = element.getElementsByTagName(ELEMENT_TAG_NAMES.shapeTextBody)
+    if (textBodies.length === 1) {
+      const textBody = textBodies[0] as Element
+      removeAllChild(textBody, ELEMENT_TAG_NAMES.paragraph)
+      for (const item of items) {
+        const newParagraph = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.paragraph)
+        if (item.level > 0) {
+          const paragraphProperties = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.paragraphProperties)
+          paragraphProperties.setAttribute(ATTRIBUTE_NAMES.level, item.level.toString())
+          newParagraph.appendChild(paragraphProperties)
+        }
+        const newRange = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.range)
+        const newRangeProperties = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.rangeProperties)
+        newRangeProperties.setAttribute(ATTRIBUTE_NAMES.lang, 'en-US')
+        newRangeProperties.setAttribute(ATTRIBUTE_NAMES.dirty, '0')
+        newRange.appendChild(newRangeProperties)
+        const newText = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.text)
+        newText.textContent = item.text
+        newRange.appendChild(newText)
+        newParagraph.appendChild(newRange)
+        textBody.appendChild(newParagraph)
+      }
+    }
+  }
+}
 
 export class PowerpointWriter {
   async generate(
@@ -56,7 +85,7 @@ export class PowerpointWriter {
         await copyFile(templatePath, temlateWorkingPath)
 
         await this.generateEmptyPresentation(stubWorkingPath, configuration.metadata)
-        const imagePaths = await this.buildImagePaths(configuration.slides, workingDirectory)
+        const imagePaths = await this.buildImagePaths(configuration.presentation, workingDirectory)
         this.generatePresentation(automizer, configuration, imagePaths)
         await automizer.write(OUTPUT_FILENAME)
 
@@ -71,9 +100,10 @@ export class PowerpointWriter {
     )
   }
 
-  private async buildImagePaths(slides: PowerpointGenerationSlideConfiguration[], workingDirectory: string) {
-    const imageOriginalPaths = slides
-      .flatMap((slide) => slide.pictures ?? [])
+  private async buildImagePaths(definition: PowerpointPresentationDefinition, workingDirectory: string) {
+    const imageOriginalPaths = [...definition.master, ...definition.slides.flatMap((slide) => slide.parts)]
+      .map((partDefinition) => partDefinition.content)
+      .filter((partDefinition): partDefinition is PowerpointPicturePartContent => partDefinition.type === 'picture')
       .map((image) => image.path)
       .filter((value, index, array) => array.indexOf(value) === index)
 
@@ -88,74 +118,12 @@ export class PowerpointWriter {
     ) as Record<string, string>
   }
 
-  private async generateEmptyPresentation(outputPath: string, metadata: PowerpointGenerationMetadata) {
+  private async generateEmptyPresentation(outputPath: string, metadata: PresentationMetadata) {
     await pptx.compose(async (pres: Presentation) => {
       pres.title(metadata.title).author(metadata.author).company(metadata.company).subject(metadata.subject)
       await pres.layout('LAYOUT_WIDE').addSlide()
     })
     await pptx.save(outputPath)
-  }
-
-  private applyTextChanges(textPlaceholders: PowerpointGenerationTextPlaceholder[], slide: IMaster | ISlide) {
-    for (const masterText of textPlaceholders) {
-      if (masterText.content.length === 0) {
-        slide.removeElement({ creationId: masterText.creationId, name: masterText.creationId })
-        continue
-      }
-      if (typeof masterText.content === 'string') {
-        slide.modifyElement(
-          { creationId: masterText.creationId, name: masterText.creationId },
-          ModifyTextHelper.setText(masterText.content),
-        )
-      } else {
-        slide.modifyElement(
-          { creationId: masterText.creationId, name: masterText.creationId },
-          (element: XmlElement) => {
-            const textBodies = element.getElementsByTagName(ELEMENT_TAG_NAMES.shapeTextBody)
-            if (textBodies.length === 1) {
-              const textBody = textBodies[0] as Element
-              removeAllChild(textBody, ELEMENT_TAG_NAMES.paragraph)
-              for (const newParagraphConfig of masterText.content as PowerpointGenerationTextLines) {
-                const newParagraph = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.paragraph)
-                if (newParagraphConfig.level > 0) {
-                  const paragraphProperties = textBody.ownerDocument.createElement(
-                    ELEMENT_TAG_NAMES.paragraphProperties,
-                  )
-                  paragraphProperties.setAttribute(ATTRIBUTE_NAMES.level, newParagraphConfig.level.toString())
-                  newParagraph.appendChild(paragraphProperties)
-                }
-                const newRange = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.range)
-                const newRangeProperties = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.rangeProperties)
-                newRangeProperties.setAttribute(ATTRIBUTE_NAMES.lang, 'en-US')
-                newRangeProperties.setAttribute(ATTRIBUTE_NAMES.dirty, '0')
-                newRange.appendChild(newRangeProperties)
-                const newText = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.text)
-                newText.textContent = newParagraphConfig.text
-                newRange.appendChild(newText)
-                newParagraph.appendChild(newRange)
-                textBody.appendChild(newParagraph)
-              }
-            }
-          },
-        )
-      }
-    }
-  }
-
-  private applyImageChanges(
-    imagePlaceholders: PowerpointGenerationImagePlaceholder[],
-    imagePaths: Record<string, string>,
-    slide: IMaster | ISlide,
-  ) {
-    for (const pictureConfiguration of imagePlaceholders) {
-      slide.modifyElement(
-        { creationId: pictureConfiguration.creationId, name: pictureConfiguration.creationId },
-        ModifyImageHelper.setRelationTarget(imagePaths[pictureConfiguration.path] as string) as (
-          element: XmlElement | undefined,
-          arg1: XmlElement | undefined,
-        ) => void,
-      )
-    }
   }
 
   private generatePresentation(
@@ -168,17 +136,89 @@ export class PowerpointWriter {
       presentation.loadMedia(name)
     }
     presentation.addMaster(TEMPLATE_LABEL, 1, (master) => {
-      this.applyTextChanges(configuration.masterTexts, master)
+      this.fillPartContent(configuration.template.masterParts, configuration.presentation.master, master, imagePaths)
     })
-    for (const slideConfiguration of configuration.slides) {
-      presentation.addSlide(TEMPLATE_LABEL, slideConfiguration.copyOnSlide, (slide) => {
-        if (slideConfiguration.texts) {
-          this.applyTextChanges(slideConfiguration.texts, slide)
-        }
-        if (slideConfiguration.pictures) {
-          this.applyImageChanges(slideConfiguration.pictures, imagePaths, slide)
-        }
+    for (const slideConfiguration of configuration.presentation.slides) {
+      const layout = configuration.template.layouts.find((layout) => layout.name === slideConfiguration.layout)
+      if (!layout) {
+        throw new Error(`Layout '${slideConfiguration.layout}' not found in template`)
+      }
+      presentation.addSlide(TEMPLATE_LABEL, layout.baseSlideNumber, (slide) => {
+        this.fillPartContent(layout.parts, slideConfiguration.parts, slide, imagePaths)
       })
+    }
+  }
+
+  private fillPartContent(
+    parts: PowerpointTemplatePart[],
+    definitions: PowerpointPartDefinition[],
+    object: IMaster | ISlide,
+    imagePaths: Record<string, string>,
+  ) {
+    const processedElements = new Set<string>()
+    for (const definition of definitions) {
+      if (processedElements.has(definition.name)) {
+        throw new Error(`Part '${definition.name}' is defined multiple times`)
+      }
+
+      const part = parts.find((part) => part.name === definition.name)
+      if (!part) {
+        throw new Error(`Part '${definition.name}' not found in template`)
+      }
+
+      switch (part.type) {
+        case 'line': {
+          if (definition.content.type !== 'line') {
+            throw new Error(`Part '${definition.name}' should be a line`)
+          }
+          object.modifyElement(
+            { name: part.creationId, creationId: part.creationId },
+            ModifyTextHelper.setText(definition.content.text),
+          )
+          break
+        }
+        case 'picture': {
+          if (definition.content.type !== 'picture') {
+            throw new Error(`Part '${definition.name}' should be a picture`)
+          }
+          object.modifyElement(
+            { name: part.creationId, creationId: part.creationId },
+            ModifyImageHelper.setRelationTarget(imagePaths[definition.content.path] as string) as (
+              element: XmlElement | undefined,
+              arg1: XmlElement | undefined,
+            ) => void,
+          )
+          break
+        }
+        case 'text': {
+          if (definition.content.type !== 'list') {
+            throw new Error(`Part '${definition.name}' should be a list`)
+          }
+          object.modifyElement(
+            { name: part.creationId, creationId: part.creationId },
+            updateTextList(definition.content.items),
+          )
+          break
+        }
+        default: {
+          const _never: never = part.type
+          throw new Error(`Part '${part.name}' has an unknown type`, _never)
+        }
+      }
+
+      processedElements.add(definition.name)
+    }
+
+    for (const part of parts) {
+      if (processedElements.has(part.name)) {
+        continue
+      }
+      if (part.type === 'picture') {
+        // We currently want to keep the picture from the template even when not set in the presentation
+        continue
+      }
+
+      object.removeElement({ name: part.creationId, creationId: part.creationId })
     }
   }
 }

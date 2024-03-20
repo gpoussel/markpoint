@@ -1,7 +1,16 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import { PowerpointReader, PowerpointWriter } from '@markpoint/powerpoint'
+import {
+  PowerpointReader,
+  PowerpointWriter,
+  type PowerpointPresentationDefinition,
+  type PresentationMetadata,
+  type PresentationTemplateConfiguration,
+  type PowerpointPartDefinition,
+  type PowerpointSlidesConfiguration,
+  type PowerpointGenerationConfiguration,
+} from '@markpoint/powerpoint'
 import { cac } from 'cac'
 
 async function analyze(path: string, outputPath: string | undefined) {
@@ -24,136 +33,130 @@ async function sampleGeneration(templatePath: string, outputPath: string) {
   const sampleAuthor = 'Presentation Author'
   const sampleTitle = 'Lorem Ipsum Title'
   const sampleDate = '28/06/2024'
-  await writer.generate(
-    templatePath,
-    {
-      metadata: {
-        company: 'Acme Inc.',
-        author: sampleAuthor,
-        title: sampleTitle,
-        subject: 'Presentation Subject',
+  const metadata: PresentationMetadata = {
+    company: 'Acme Inc.',
+    author: sampleAuthor,
+    title: sampleTitle,
+    subject: 'Presentation Subject',
+  }
+  const template: PresentationTemplateConfiguration = {
+    layouts: [
+      {
+        name: 'title',
+        baseSlideNumber: 4,
+        parts: [
+          { name: 'title', type: 'line', creationId: '{6D871570-FBB8-F282-1B97-65C16AE6C6F4}' },
+          { name: 'subtitle', type: 'line', creationId: '{4F18DD32-924E-CE9C-91B0-4F30CCE1B6F9}' },
+        ],
       },
-      masterTexts: [
+      {
+        name: 'sectionTitle',
+        baseSlideNumber: 24,
+        parts: [
+          { name: 'title', type: 'line', creationId: '{05383CED-A871-D722-5C38-FDB6D14AA784}' },
+          { name: 'subtitle', type: 'line', creationId: '{4F2608E1-5E03-2C7E-434E-5BF07E81F24A}' },
+          { name: 'background', type: 'picture', creationId: '{7B4224E4-95EA-4DE2-B734-333DC4BF7A4F}' },
+        ],
+      },
+      {
+        name: 'contentSlide',
+        baseSlideNumber: 21,
+        parts: [
+          { name: 'title', type: 'line', creationId: '{4582957B-1559-50B8-87D1-3F29F9DD12B2}' },
+          { name: 'subtitle', type: 'line', creationId: '{28862325-59A6-26E6-FB10-93F6B61575F0}' },
+          { name: 'content', type: 'text', creationId: '{0984FDF1-E23B-9E8F-73B5-6BF495603FA0}' },
+        ],
+      },
+      {
+        name: 'end',
+        baseSlideNumber: 63,
+        parts: [],
+      },
+    ],
+    masterParts: [{ name: 'footer', type: 'line', creationId: '{62086BA9-1591-C6CD-E573-A5F8961683B1}' }],
+  }
+  const slides: PowerpointSlidesConfiguration[] = [
+    {
+      layout: 'title',
+      parts: [
         {
-          creationId: '{62086BA9-1591-C6CD-E573-A5F8961683B1}',
-          content: [sampleTitle, sampleAuthor, sampleDate].join(' | '),
+          name: 'title',
+          content: { type: 'line', text: sampleTitle },
+        },
+        {
+          name: 'subtitle',
+          content: { type: 'line', text: 'Presentation subtitle' },
         },
       ],
-      slides: [
+    },
+    ...[1, 2].flatMap((sectionNb) => {
+      return [
         {
-          copyOnSlide: 4,
-          texts: [
-            {
-              creationId: '{6D871570-FBB8-F282-1B97-65C16AE6C6F4}',
-              content: sampleTitle,
-            },
-            {
-              creationId: '{4F18DD32-924E-CE9C-91B0-4F30CCE1B6F9}',
-              content: 'Presentation Subtitle',
-            },
+          layout: 'sectionTitle',
+          parts: [
+            { name: 'title', content: { type: 'line', text: `Section ${sectionNb}` } },
+            { name: 'subtitle', content: { type: 'line', text: `Section ${sectionNb} subtitle` } },
+            { name: 'background', content: { type: 'picture', path: path.join('__fixtures__', '3385x1905.png') } },
           ],
         },
-        ...[1, 2].flatMap((sectionNb) => {
+        ...[1, 2].flatMap((subSectionNb) => {
           return [
             {
-              copyOnSlide: 24,
-              texts: [
+              layout: 'contentSlide',
+              parts: [
+                { name: 'title', content: { type: 'line', text: `Section ${sectionNb} – Page ${subSectionNb}` } },
+                { name: 'subtitle', content: { type: 'line', text: `Subtitle of subsection ${subSectionNb}` } },
                 {
-                  creationId: '{05383CED-A871-D722-5C38-FDB6D14AA784}',
-                  content: `Section ${sectionNb}`,
-                },
-                {
-                  creationId: '{4F2608E1-5E03-2C7E-434E-5BF07E81F24A}',
-                  content: `Section ${sectionNb} subtitle`,
-                },
-              ],
-              pictures: [
-                {
-                  creationId: '{7B4224E4-95EA-4DE2-B734-333DC4BF7A4F}',
-                  path: path.join('__fixtures__', '3385x1905.png'),
-                },
-              ],
-            },
-            ...[1, 2].map((subsectionNb) => ({
-              copyOnSlide: 21,
-              texts: [
-                {
-                  creationId: '{4582957B-1559-50B8-87D1-3F29F9DD12B2}',
-                  content: `Section ${sectionNb} – Page ${subsectionNb}`,
-                },
-                {
-                  creationId: '{28862325-59A6-26E6-FB10-93F6B61575F0}',
-                  content: `Subtitle of subsection ${subsectionNb}`,
-                },
-                {
-                  creationId: '{0984FDF1-E23B-9E8F-73B5-6BF495603FA0}',
-                  content: [
-                    {
-                      text: `Outside bullet – Section ${sectionNb} – Page ${subsectionNb}`,
-                      level: 0,
-                    },
-                    {
-                      text: 'First bullet 1',
-                      level: 1,
-                    },
-                    {
-                      text: 'Inside bullet 1',
-                      level: 2,
-                    },
-                    {
-                      text: 'Again bullet 1',
-                      level: 3,
-                    },
-                    {
-                      text: 'Final bullet 1',
-                      level: 4,
-                    },
-                    {
-                      text: 'Again bullet 2',
-                      level: 3,
-                    },
-                    {
-                      text: 'Inside bullet 2',
-                      level: 2,
-                    },
-                    {
-                      text: 'First bullet 2',
-                      level: 1,
-                    },
-                    {
-                      text: 'Last paragraph',
-                      level: 0,
-                    },
-                  ],
-                },
-              ],
-            })),
-            {
-              copyOnSlide: 21,
-              texts: [
-                {
-                  creationId: '{4582957B-1559-50B8-87D1-3F29F9DD12B2}',
-                  content: `Section ${sectionNb} – Page with no content`,
-                },
-                {
-                  creationId: '{28862325-59A6-26E6-FB10-93F6B61575F0}',
-                  content: '',
-                },
-                {
-                  creationId: '{0984FDF1-E23B-9E8F-73B5-6BF495603FA0}',
-                  content: [],
+                  name: 'content',
+                  content: {
+                    type: 'list',
+                    items: [
+                      { text: `Outside bullet – Section ${sectionNb} – Page ${subSectionNb}`, level: 0 },
+                      { text: 'First bullet 1', level: 1 },
+                      { text: 'Inside bullet 1', level: 2 },
+                      { text: 'Again bullet 1', level: 3 },
+                      { text: 'Final bullet 1', level: 4 },
+                      { text: 'Again bullet 2', level: 3 },
+                      { text: 'Inside bullet 2', level: 2 },
+                      { text: 'First bullet 2', level: 1 },
+                      { text: 'Last paragraph', level: 0 },
+                    ],
+                  },
                 },
               ],
             },
           ]
         }),
         {
-          copyOnSlide: 63,
+          layout: 'contentSlide',
+          parts: [{ name: 'title', content: { type: 'line', text: `Section ${sectionNb} – No content` } }],
         },
-      ],
+      ] as PowerpointSlidesConfiguration[]
+    }),
+    {
+      layout: 'end',
+      parts: [],
     },
-    outputPath,
-  )
+  ]
+  const master: PowerpointPartDefinition[] = [
+    {
+      name: 'footer',
+      content: {
+        type: 'line',
+        text: [sampleTitle, sampleAuthor, sampleDate].join(' | '),
+      },
+    },
+  ]
+  const presentation: PowerpointPresentationDefinition = {
+    master,
+    slides,
+  }
+  const configuration: PowerpointGenerationConfiguration = {
+    metadata,
+    template,
+    presentation,
+  }
+  await writer.generate(templatePath, configuration, outputPath)
 }
 
 async function main() {
