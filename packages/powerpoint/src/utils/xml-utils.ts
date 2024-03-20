@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-dom-node-append */
 /**
  * Iterates over a collection of HTML elements
  * @param collection HTML elements to iterate over
@@ -20,16 +21,29 @@ export function map<T extends Element, V>(collection: HTMLCollectionOf<T>, callb
 }
 
 /**
- * Remove all children from a DOM node
+ * Remove all children from a DOM node, based on their tag name
  * @param parentNode Parent node to remove children from
  * @param tagName Tag name of children to remove
  */
-export function removeAllChild(parentNode: Element, tagName: string) {
+export function removeAllNamedChild(parentNode: Element, tagName: string) {
   let elements = parentNode.getElementsByTagName(tagName)
   while (elements.length > 0) {
     // eslint-disable-next-line unicorn/prefer-dom-node-remove
     parentNode.removeChild(elements[0] as Element)
     elements = parentNode.getElementsByTagName(tagName)
+  }
+}
+
+/**
+ * Remove all children from a DOM node
+ * @param parentNode Parent node to remove children from
+ */
+export function removeAllChild(parentNode: Element) {
+  let elements = parentNode.childNodes
+  while (elements.length > 0) {
+    // eslint-disable-next-line unicorn/prefer-dom-node-remove
+    parentNode.removeChild(elements[0] as Element)
+    elements = parentNode.childNodes
   }
 }
 
@@ -49,6 +63,21 @@ export function getElementByTagNameRecursive(element: Element, ...tagNames: stri
     }
   }
   return currentElement
+}
+
+/**
+ * Gets or creates a direct child element by its tag name
+ * @param element Element to search in
+ * @param tagNames Tag name of the child
+ */
+export function getOrCreateChild(element: Element, tagName: string): Element {
+  const childElement = element.getElementsByTagName(tagName)
+  if (childElement.length > 0 && childElement[0]) {
+    return childElement[0]
+  }
+  const newElement = element.ownerDocument.createElement(tagName)
+  element.appendChild(newElement)
+  return newElement
 }
 
 /**

@@ -22,8 +22,9 @@ import type {
   PowerpointTemplatePart,
   PresentationMetadata,
 } from './generation/configuration.js'
+import { highlightCode } from './generation/highlight.js'
 import { ATTRIBUTE_NAMES, ELEMENT_TAG_NAMES } from './opendocument.js'
-import { removeAllChild } from './utils/xml-utils.js'
+import { removeAllNamedChild } from './utils/xml-utils.js'
 
 const pptx = new PPTX.Composer()
 
@@ -37,7 +38,7 @@ const updateTextList = (items: PowerpointListItem[]) => {
     const textBodies = element.getElementsByTagName(ELEMENT_TAG_NAMES.shapeTextBody)
     if (textBodies.length === 1) {
       const textBody = textBodies[0] as Element
-      removeAllChild(textBody, ELEMENT_TAG_NAMES.paragraph)
+      removeAllNamedChild(textBody, ELEMENT_TAG_NAMES.paragraph)
       for (const item of items) {
         const newParagraph = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.paragraph)
         if (item.level > 0) {
@@ -191,13 +192,20 @@ export class PowerpointWriter {
           break
         }
         case 'text': {
-          if (definition.content.type !== 'list') {
-            throw new Error(`Part '${definition.name}' should be a list`)
+          if (definition.content.type !== 'list' && definition.content.type !== 'code') {
+            throw new Error(`Part '${definition.name}' should be a list or code`)
           }
-          object.modifyElement(
-            { name: part.creationId, creationId: part.creationId },
-            updateTextList(definition.content.items),
-          )
+          if (definition.content.type === 'list') {
+            object.modifyElement(
+              { name: part.creationId, creationId: part.creationId },
+              updateTextList(definition.content.items),
+            )
+          } else {
+            object.modifyElement(
+              { name: part.creationId, creationId: part.creationId },
+              highlightCode(definition.content.language, definition.content.code),
+            )
+          }
           break
         }
         default: {

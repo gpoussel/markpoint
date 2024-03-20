@@ -89,50 +89,97 @@ async function sampleGeneration(templatePath: string, outputPath: string) {
         },
       ],
     },
-    ...[1, 2].flatMap((sectionNb) => {
-      return [
+    {
+      layout: 'sectionTitle',
+      parts: [
+        { name: 'title', content: { type: 'line', text: `Section 1` } },
+        { name: 'subtitle', content: { type: 'line', text: `Section 1 subtitle` } },
+        { name: 'background', content: { type: 'picture', path: path.join('__fixtures__', '3385x1905.png') } },
+      ],
+    },
+    {
+      layout: 'contentSlide',
+      parts: [
+        { name: 'title', content: { type: 'line', text: `Section 1 – Code` } },
         {
-          layout: 'sectionTitle',
-          parts: [
-            { name: 'title', content: { type: 'line', text: `Section ${sectionNb}` } },
-            { name: 'subtitle', content: { type: 'line', text: `Section ${sectionNb} subtitle` } },
-            { name: 'background', content: { type: 'picture', path: path.join('__fixtures__', '3385x1905.png') } },
-          ],
+          name: 'content',
+          content: {
+            type: 'code',
+            language: 'json',
+            code: `{
+  // This is the basic data
+  "name": "John Doe",
+  "age": 35,
+  "city": "New York City",
+  "maritalInfo": {
+    // Marital information
+    "isMarried": true,		// ← Look at that; that's awesome
+    "wifeName": "Jane Doe"
+  }
+}`,
+          },
         },
-        ...[1, 2].flatMap((subSectionNb) => {
-          return [
-            {
-              layout: 'contentSlide',
-              parts: [
-                { name: 'title', content: { type: 'line', text: `Section ${sectionNb} – Page ${subSectionNb}` } },
-                { name: 'subtitle', content: { type: 'line', text: `Subtitle of subsection ${subSectionNb}` } },
-                {
-                  name: 'content',
-                  content: {
-                    type: 'list',
-                    items: [
-                      { text: `Outside bullet – Section ${sectionNb} – Page ${subSectionNb}`, level: 0 },
-                      { text: 'First bullet 1', level: 1 },
-                      { text: 'Inside bullet 1', level: 2 },
-                      { text: 'Again bullet 1', level: 3 },
-                      { text: 'Final bullet 1', level: 4 },
-                      { text: 'Again bullet 2', level: 3 },
-                      { text: 'Inside bullet 2', level: 2 },
-                      { text: 'First bullet 2', level: 1 },
-                      { text: 'Last paragraph', level: 0 },
-                    ],
-                  },
-                },
-              ],
-            },
-          ]
-        }),
+      ],
+    },
+    {
+      layout: 'contentSlide',
+      parts: [
+        { name: 'title', content: { type: 'line', text: `Section 1 – List` } },
+        { name: 'subtitle', content: { type: 'line', text: `Subtitle of list` } },
         {
-          layout: 'contentSlide',
-          parts: [{ name: 'title', content: { type: 'line', text: `Section ${sectionNb} – No content` } }],
+          name: 'content',
+          content: {
+            type: 'list',
+            items: [
+              { text: `Outside bullet`, level: 0 },
+              { text: 'First bullet 1', level: 1 },
+              { text: 'Inside bullet 1', level: 2 },
+              { text: 'Again bullet 1', level: 3 },
+              { text: 'Final bullet 1', level: 4 },
+              { text: 'Again bullet 2', level: 3 },
+              { text: 'Inside bullet 2', level: 2 },
+              { text: 'First bullet 2', level: 1 },
+              { text: 'Last paragraph', level: 0 },
+            ],
+          },
         },
-      ] as PowerpointSlidesConfiguration[]
-    }),
+      ],
+    },
+    {
+      layout: 'sectionTitle',
+      parts: [
+        { name: 'title', content: { type: 'line', text: `Section 2` } },
+        { name: 'subtitle', content: { type: 'line', text: `Section 2 subtitle` } },
+      ],
+    },
+    {
+      layout: 'contentSlide',
+      parts: [
+        { name: 'title', content: { type: 'line', text: `Section 2 – Code` } },
+        {
+          name: 'content',
+          content: {
+            type: 'code',
+            language: 'yaml',
+            code: `---
+doe: "a deer, a female deer"
+ray: "a drop of golden sun"
+pi: 3.14159
+xmas: true
+french-hens: 3
+calling-birds:
+  - huey
+  - dewey
+  - louie
+  - fred`,
+          },
+        },
+      ],
+    },
+    {
+      layout: 'contentSlide',
+      parts: [{ name: 'title', content: { type: 'line', text: `Section 2 – No content` } }],
+    },
     {
       layout: 'end',
       parts: [],

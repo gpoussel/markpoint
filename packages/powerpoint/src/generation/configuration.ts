@@ -25,6 +25,14 @@ export interface PowerpointLinePartContent {
   text: string
 }
 
+export type PowerpointCodeLanguage = 'json' | 'yaml'
+
+export interface PowerpointCodePartContent {
+  type: 'code'
+  language: PowerpointCodeLanguage
+  code: string
+}
+
 export interface PowerpointListItem {
   text: string
   level: 0 | 1 | 2 | 3 | 4
@@ -40,7 +48,11 @@ export interface PowerpointPicturePartContent {
   path: string
 }
 
-export type PowerpointPartContent = PowerpointLinePartContent | PowerpointListPartContent | PowerpointPicturePartContent
+export type PowerpointPartContent =
+  | PowerpointLinePartContent
+  | PowerpointListPartContent
+  | PowerpointPicturePartContent
+  | PowerpointCodePartContent
 
 export interface PowerpointPartDefinition {
   name: string
