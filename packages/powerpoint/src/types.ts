@@ -1,17 +1,26 @@
-export interface PowerpointSlideTextElement {
+export interface PowerpointMasterTemplate {
+  masterTextElements: PowerpointSlideTextElement[]
+  layoutSlides: PowerpointLayoutSlide[]
+  slides: PowerpointSlide[]
+}
+
+export interface PowerpointLocation {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+export interface PowerpointSlideTextElement extends PowerpointLocation {
   id: string
   creationId?: string | undefined
   name: string
   text?: string
 }
 
-export interface PowerpointSlidePictureElement {
-  id: string
+export interface PowerpointLayoutSlide {
   name: string
-  x: number
-  y: number
-  width: number
-  height: number
+  number: number
 }
 
 export interface PowerpointSlide {
@@ -22,15 +31,9 @@ export interface PowerpointSlide {
   pictures: PowerpointSlidePictureElement[]
 }
 
-export interface PowerpointMasterTemplate {
-  masterTextElements: PowerpointSlideTextElement[]
-  layoutSlides: PowerpointLayoutSlide[]
-  slides: PowerpointSlide[]
-}
-
-export interface PowerpointLayoutSlide {
+export interface PowerpointSlidePictureElement extends PowerpointLocation {
+  id: string
   name: string
-  number: number
 }
 
 export interface PowerpointGenerationSlideConfiguration {

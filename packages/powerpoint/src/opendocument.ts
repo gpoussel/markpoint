@@ -1,16 +1,20 @@
 export const ELEMENT_TAG_NAMES = {
   creationId: 'a16:creationId',
+  extent: 'a:ext',
   nonVisualDrawingProperties: 'p:cNvPr',
+  offset: 'a:off',
   paragraph: 'a:p',
   paragraphProperties: 'a:pPr',
   range: 'a:r',
   rangeProperties: 'a:rPr',
   relationships: 'Relationship',
   shape: 'p:sp',
+  shapeProperties: 'p:spPr',
   shapeTextBody: 'p:txBody',
   slide: 'p:cSld',
   slideLayoutId: 'p:sldLayoutId',
   text: 'a:t',
+  transform: 'a:xfrm',
 }
 
 export const XML_FILE_NAMES = {
@@ -20,6 +24,8 @@ export const XML_FILE_NAMES = {
 
 export const ATTRIBUTE_NAMES = {
   creationIdId: 'id',
+  cx: 'cx',
+  cy: 'cy',
   dirty: 'dirty',
   id: 'Id',
   lang: 'lang',
@@ -30,6 +36,8 @@ export const ATTRIBUTE_NAMES = {
   shapePropertiesName: 'name',
   slideLayoutIdId: 'r:id',
   slideName: 'name',
+  x: 'x',
+  y: 'y',
 }
 
 export const SLIDE_ELEMENT_TYPES = {

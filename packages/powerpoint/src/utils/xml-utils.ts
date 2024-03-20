@@ -19,6 +19,11 @@ export function map<T extends Element, V>(collection: HTMLCollectionOf<T>, callb
   return result
 }
 
+/**
+ * Remove all children from a DOM node
+ * @param parentNode Parent node to remove children from
+ * @param tagName Tag name of children to remove
+ */
 export function removeAllChild(parentNode: Element, tagName: string) {
   let elements = parentNode.getElementsByTagName(tagName)
   while (elements.length > 0) {
@@ -26,6 +31,24 @@ export function removeAllChild(parentNode: Element, tagName: string) {
     parentNode.removeChild(elements[0] as Element)
     elements = parentNode.getElementsByTagName(tagName)
   }
+}
+
+/**
+ * Returns an element by its tag name (including at nested levels)
+ * @param element Element to search in
+ * @param tagNames Tag names to search for
+ */
+export function getElementByTagNameRecursive(element: Element, ...tagNames: string[]): Element | undefined {
+  let currentElement = element
+  for (const tagName of tagNames) {
+    const childElements = currentElement.getElementsByTagName(tagName)
+    if (childElements.length > 0 && childElements[0]) {
+      currentElement = childElements[0]
+    } else {
+      return undefined
+    }
+  }
+  return currentElement
 }
 
 /**
