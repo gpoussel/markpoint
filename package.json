@@ -7,8 +7,8 @@
   "type": "module",
   "main": "packages/cli/dist/index.js",
   "scripts": {
-    "dev": "turbo run dev",
     "build": "turbo run build",
+    "dev": "turbo run dev",
     "lint": "turbo run lint",
     "prepare": "husky"
   },
