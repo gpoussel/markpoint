@@ -128,6 +128,23 @@ async function sampleGeneration(templatePath: string, outputPath: string) {
                 },
               ],
             })),
+            {
+              copyOnSlide: 21,
+              texts: [
+                {
+                  creationId: '{4582957B-1559-50B8-87D1-3F29F9DD12B2}',
+                  content: `Section ${sectionNb} – Page with no content`,
+                },
+                {
+                  creationId: '{28862325-59A6-26E6-FB10-93F6B61575F0}',
+                  content: '',
+                },
+                {
+                  creationId: '{0984FDF1-E23B-9E8F-73B5-6BF495603FA0}',
+                  content: [],
+                },
+              ],
+            },
           ]
         }),
         {

@@ -98,6 +98,10 @@ export class PowerpointWriter {
 
   private applyTextChanges(textPlaceholders: PowerpointGenerationTextPlaceholder[], slide: IMaster | ISlide) {
     for (const masterText of textPlaceholders) {
+      if (masterText.content.length === 0) {
+        slide.removeElement({ creationId: masterText.creationId, name: masterText.creationId })
+        continue
+      }
       if (typeof masterText.content === 'string') {
         slide.modifyElement(
           { creationId: masterText.creationId, name: masterText.creationId },
