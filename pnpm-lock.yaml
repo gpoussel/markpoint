@@ -25,6 +25,9 @@ importers:
       '@types/node':
         specifier: ^20.11.30
         version: 20.11.30
+      '@vitest/coverage-v8':
+        specifier: ^1.4.0
+        version: 1.4.0(vitest@1.4.0)
       eslint:
         specifier: 8.57.0
         version: 8.57.0
@@ -43,6 +46,9 @@ importers:
       typescript:
         specifier: 5.4.3
         version: 5.4.3
+      vitest:
+        specifier: ^1.4.0
+        version: 1.4.0(@types/node@20.11.30)
 
   packages/cli:
     dependencies:
