@@ -13,13 +13,12 @@ const FrontmatterObjectType = z.object({
 export type FrontmatterAttributes = z.infer<typeof FrontmatterObjectType>
 
 export function extractFrontMatter(tree: Root) {
-  const children = tree.children
-  const firstChildren = children[0]
-  if (!firstChildren) {
+  const firstChild = tree.children[0]
+  if (!firstChild) {
     // Document is empty: no frontmatter
     return
   }
-  if ((firstChildren.type as string) !== 'yaml') {
+  if (firstChild.type !== 'yaml') {
     // No YAML frontmatter
     return
   }

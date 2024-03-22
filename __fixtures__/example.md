@@ -42,7 +42,7 @@ Outside bullet
 
 Last paragraph
 
-### Section 2
+## Section 2
 
 Section 2 subtitle
 

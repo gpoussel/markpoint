@@ -88,10 +88,6 @@ importers:
       zod:
         specifier: ^3.22.4
         version: 3.22.4
-    devDependencies:
-      '@types/hast':
-        specifier: ^3.0.4
-        version: 3.0.4
 
   packages/powerpoint:
     dependencies:

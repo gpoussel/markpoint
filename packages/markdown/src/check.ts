@@ -31,6 +31,9 @@ function checkThematicBreak(element: ThematicBreak) {
   }
 }
 function checkHeading(element: Heading) {
+  if (element.depth === 1) {
+    throw new Error(`Heading 1 is only allowed as the first element, found one at line ${element.position?.start.line}`)
+  }
   if (element.depth >= 4) {
     throw new Error(`Heading depth must be less than 4 at line ${element.position?.start.line}`)
   }
