@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "tsc && tsc -w",
     "build": "tsc -p tsconfig.build.json",
-    "lint": "prettier -c . && eslint . --cache --max-warnings=0 && tsc --noEmit"
+    "lint": "prettier -c . && eslint . --cache --max-warnings=0 && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@types/mdast": "^4.0.3",
@@ -19,5 +21,9 @@
     "vfile": "^6.0.1",
     "yaml": "^2.4.1",
     "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^1.4.0",
+    "vitest": "^1.4.0"
   }
 }
