@@ -6,7 +6,6 @@ import remarkFrontmatter from 'remark-frontmatter'
 import remarkParse from 'remark-parse'
 import { unified } from 'unified'
 
-import { checkRoot } from './check.js'
 import { convertMarkdownSections } from './conversion.js'
 import { extractFrontMatter } from './frontmatter.js'
 import { extractTitle } from './title.js'
@@ -51,7 +50,6 @@ export class MarkdownReader {
     // eslint-disable-next-line no-console
     console.log({ frontmatter, title })
 
-    checkRoot(processingResult)
     const sections = convertMarkdownSections(processingResult)
     debugPrintAst(processingResult, 0)
 
