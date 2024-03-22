@@ -1,13 +1,9 @@
-import type { Code, Heading, List, ListItem, Paragraph, PhrasingContent, Root, RootContent, ThematicBreak } from 'mdast'
-
-const SUPPORTED_CODE_LANGUAGES = new Set(['json', 'text', 'yaml', 'yml'])
+import type { Heading, List, ListItem, Paragraph, PhrasingContent, Root, RootContent, ThematicBreak } from 'mdast'
 
 // thematicBreak is the --- separator
 // heading is the title of each section
 // paragraph is the text
 // list is a list of items
-// code is a code block
-
 function checkPhrasingContent(element: PhrasingContent) {
   if (
     element.type === 'text' ||
@@ -17,7 +13,7 @@ function checkPhrasingContent(element: PhrasingContent) {
     element.type === 'strong' ||
     element.type === 'image'
   ) {
-    // Basic text
+    // Basic text => valid
     return
   }
   throw new Error(`Unsupported phrasing content type: ${element.type} at line ${element.position?.start.line}`)
@@ -31,12 +27,6 @@ function checkThematicBreak(element: ThematicBreak) {
   }
 }
 function checkHeading(element: Heading) {
-  if (element.depth === 1) {
-    throw new Error(`Heading 1 is only allowed as the first element, found one at line ${element.position?.start.line}`)
-  }
-  if (element.depth >= 4) {
-    throw new Error(`Heading depth must be less than 4 at line ${element.position?.start.line}`)
-  }
   for (const child of element.children) {
     checkPhrasingContent(child)
   }
@@ -67,14 +57,6 @@ function checkList(element: List) {
     checkListItem(item)
   }
 }
-function checkCode(element: Code) {
-  if (!element.lang) {
-    throw new Error(`Code block language must be set at line ${element.position?.start.line}`)
-  }
-  if (!SUPPORTED_CODE_LANGUAGES.has(element.lang)) {
-    throw new Error(`Unsupported code block language: ${element.lang} at line ${element.position?.start.line}`)
-  }
-}
 
 /**
  * Since the library is supporting a limited sunbset of markdown, we need to check that the AST is valid
@@ -83,17 +65,19 @@ function checkCode(element: Code) {
  */
 export function checkRoot(root: Root) {
   for (const children of root.children) {
-    const checkCallbacks: Record<string, (children: RootContent) => void> = {
+    const checkCallbacks: Record<string, ((children: RootContent) => void) | undefined> = {
       thematicBreak: (node: RootContent) => checkThematicBreak(node as ThematicBreak),
       heading: (node: RootContent) => checkHeading(node as Heading),
       paragraph: (node: RootContent) => checkParagraph(node as Paragraph),
       list: (node: RootContent) => checkList(node as List),
-      code: (node: RootContent) => checkCode(node as Code),
+      code: undefined,
     }
     const checkCallback = checkCallbacks[children.type]
-    if (!checkCallback) {
+    if (!(children.type in checkCallbacks)) {
       throw new Error(`Unsupported node type: ${children.type} at line ${children.position?.start.line ?? 'unknown'}`)
     }
-    checkCallback(children)
+    if (checkCallback) {
+      checkCallback(children)
+    }
   }
 }

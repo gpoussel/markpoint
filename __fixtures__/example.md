@@ -10,7 +10,7 @@ reference: '123456_2024'
 
 ## Section 1
 
-Section 1 subtitle
+Section 1 subtitle with **bold**, _italic_ and **_bold/italic_** text.
 
 ### Section 1 - Code
 
@@ -44,7 +44,7 @@ Last paragraph
 
 ## Section 2
 
-Section 2 subtitle
+Section 2 subtitle with `code` inside.
 
 ### Section 2 - Code
 
@@ -62,4 +62,12 @@ calling-birds:
   - fred
 ```
 
-### Section 2 - No content
+### Section 2 - Content with separator
+
+This is a first sentence.
+
+And a second one.
+
+---
+
+And a third one on another slidep.

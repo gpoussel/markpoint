@@ -19,9 +19,10 @@ async function main() {
       await samplePowerpointGeneration(templateFile, outputFile)
     })
   cli
-    .command('demo-md <inputFile> <outputFile>', 'demonstrate capabilities of Markdown reading')
-    .action(async (inputFile: string, outputFile: string) => {
-      await sampleMarkdownReading(inputFile, outputFile)
+    .command('demo-md <inputFile>', 'demonstrate capabilities of Markdown reading')
+    .option('--output <outputFile>', 'output YAML file')
+    .action(async (inputFile: string, options: { output: string | undefined }) => {
+      await sampleMarkdownReading(inputFile, options.output)
     })
   cli.help()
   cli.parse(process.argv, { run: false })

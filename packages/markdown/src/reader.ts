@@ -7,12 +7,10 @@ import remarkParse from 'remark-parse'
 import { unified } from 'unified'
 
 import { checkRoot } from './check.js'
+import { convertMarkdownSections } from './conversion.js'
 import { extractFrontMatter } from './frontmatter.js'
 import { extractTitle } from './title.js'
-
-export interface MarkdownPresentation {
-  filename: string
-}
+import type { MarkdownPresentation } from './types.js'
 
 function debugPrintAst(node: Node, depth: number) {
   let additionalInfo = ''
@@ -54,10 +52,12 @@ export class MarkdownReader {
     console.log({ frontmatter, title })
 
     checkRoot(processingResult)
+    const sections = convertMarkdownSections(processingResult)
     debugPrintAst(processingResult, 0)
 
     return {
       filename: path.basename(file),
+      sections,
     }
   }
 }
