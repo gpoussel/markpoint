@@ -83,6 +83,6 @@ describe('extractTitle', () => {
     const result = extractTitle(tree)
     expect(result).toBe('Title')
     expect(tree.children).toHaveLength(1)
-    expect(tree.children[0].type).toBe('paragraph')
+    expect(tree.children[0]?.type).toBe('paragraph')
   })
 })

@@ -32,7 +32,7 @@ describe('extractFrontMatter', () => {
     const result = extractFrontMatter(tree)
     expect(result).toBeUndefined()
     expect(tree.children).toHaveLength(1)
-    expect(tree.children[0].type).toBe('paragraph')
+    expect(tree.children[0]?.type).toBe('paragraph')
   })
 
   it('should parse and return the frontmatter object if YAML frontmatter exists', ({ expect }) => {
@@ -60,6 +60,6 @@ describe('extractFrontMatter', () => {
       author: 'John Doe',
     })
     expect(tree.children).toHaveLength(1)
-    expect(tree.children[0].type).toBe('paragraph')
+    expect(tree.children[0]?.type).toBe('paragraph')
   })
 })
