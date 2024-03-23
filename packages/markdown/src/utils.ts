@@ -39,3 +39,32 @@ export function splitParts<T, B extends boolean, S extends T>(
   }
   return (acceptInitialParts ? { initialParts, parts } : { parts }) as SplitPartReturnType<S, T, B>
 }
+
+type ExtractFirstReturnType<T, B extends boolean> = B extends true ? T : T | undefined
+
+/**
+ * Try to extract the first element of an array based on a predicate.
+ * @param array The array to search
+ * @param predicate The predicate to match
+ * @param mandatory Whether the element is mandatory
+ */
+export function extractFirst<T, R extends T, B extends boolean>(
+  array: T[],
+  predicate: (element: T) => element is R,
+  mandatory: B,
+): ExtractFirstReturnType<R, B> {
+  const firstElement = array[0]
+  if (!firstElement) {
+    if (mandatory) {
+      throw new Error('Array is empty')
+    }
+    return undefined as ExtractFirstReturnType<R, B>
+  }
+  if (!predicate(firstElement)) {
+    if (mandatory) {
+      throw new Error('First element does not match predicate')
+    }
+    return undefined as ExtractFirstReturnType<R, B>
+  }
+  return array.shift() as R
+}

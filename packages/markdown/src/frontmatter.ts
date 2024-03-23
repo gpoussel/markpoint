@@ -1,6 +1,8 @@
-import type { Root, Yaml } from 'mdast'
+import type { Root, RootContent, Yaml } from 'mdast'
 import YAML from 'yaml'
 import z from 'zod'
+
+import { extractFirst } from './utils'
 
 const FrontmatterObjectType = z.object({
   company: z.string().optional(),
@@ -13,16 +15,10 @@ const FrontmatterObjectType = z.object({
 export type FrontmatterAttributes = z.infer<typeof FrontmatterObjectType>
 
 export function extractFrontMatter(tree: Root) {
-  const firstChild = tree.children[0]
-  if (!firstChild) {
-    // Document is empty: no frontmatter
+  const yamlNode = extractFirst(tree.children, (node: RootContent): node is Yaml => node.type === 'yaml', false)
+  if (!yamlNode) {
     return
   }
-  if (firstChild.type !== 'yaml') {
-    // No YAML frontmatter
-    return
-  }
-  const yamlNode = tree.children.shift() as Yaml
   return FrontmatterObjectType.parse(
     YAML.parse(yamlNode.value, {
       strict: true,
