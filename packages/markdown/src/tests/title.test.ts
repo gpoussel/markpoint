@@ -1,12 +1,12 @@
 import type { Root } from 'mdast'
 import { describe, it } from 'vitest'
 
-import { extractTitle } from '../libs/title'
+import { extractTitle } from '../libs/title.js'
 
 describe('extractTitle', () => {
   it('should throw an error if the tree is empty', ({ expect }) => {
     const tree: Root = { type: 'root', children: [] }
-    expect(() => extractTitle(tree)).toThrowError()
+    expect(() => extractTitle(tree)).toThrowError(/empty/)
     expect(tree.children).toHaveLength(0)
   })
 
@@ -15,7 +15,7 @@ describe('extractTitle', () => {
       type: 'root',
       children: [{ type: 'paragraph', children: [{ type: 'text', value: 'Some content' }] }],
     }
-    expect(() => extractTitle(tree)).toThrowError()
+    expect(() => extractTitle(tree)).toThrowError(/match predicate/)
     expect(tree.children).toHaveLength(1)
   })
 
@@ -24,7 +24,7 @@ describe('extractTitle', () => {
       type: 'root',
       children: [{ type: 'heading', depth: 2, children: [{ type: 'text', value: 'Title' }] }],
     }
-    expect(() => extractTitle(tree)).toThrowError()
+    expect(() => extractTitle(tree)).toThrowError(/match predicate/)
   })
 
   it('should throw an error if the first heading has no child', ({ expect }) => {
@@ -38,7 +38,7 @@ describe('extractTitle', () => {
         },
       ],
     }
-    expect(() => extractTitle(tree)).toThrowError()
+    expect(() => extractTitle(tree)).toThrowError(/exactly one child/)
   })
 
   it('should throw an error if the first heading has more than one child', ({ expect }) => {
@@ -55,7 +55,7 @@ describe('extractTitle', () => {
         },
       ],
     }
-    expect(() => extractTitle(tree)).toThrowError()
+    expect(() => extractTitle(tree)).toThrowError(/exactly one child/)
   })
 
   it('should throw an error if the first heading contains no text', ({ expect }) => {
@@ -69,7 +69,7 @@ describe('extractTitle', () => {
         },
       ],
     }
-    expect(() => extractTitle(tree)).toThrowError()
+    expect(() => extractTitle(tree)).toThrowError(/must be plain text/)
   })
 
   it('should extract and return the title from the first heading', ({ expect }) => {

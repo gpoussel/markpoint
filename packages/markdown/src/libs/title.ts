@@ -1,6 +1,6 @@
 import type { Heading, Root } from 'mdast'
 
-import { extractFirst } from './utils'
+import { extractFirst } from './utils.js'
 
 export function extractTitle(tree: Root) {
   const headingNode = extractFirst(

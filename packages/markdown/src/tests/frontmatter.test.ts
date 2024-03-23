@@ -1,7 +1,7 @@
 import type { Root } from 'mdast'
 import { describe, it } from 'vitest'
 
-import { extractFrontMatter } from '../libs/frontmatter'
+import { extractFrontMatter } from '../libs/frontmatter.js'
 
 describe('extractFrontMatter', () => {
   it('should return undefined if the document is empty', ({ expect }) => {

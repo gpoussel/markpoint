@@ -22,7 +22,9 @@ describe('MarkdownReader', () => {
     const invalidFiles = await readdir(invalidFixtures)
     for (const file of invalidFiles) {
       it(`should read the invalid/${file} markdown file and throw an error`, async ({ expect }) => {
-        await expect(() => reader.read(join(__dirname, '__fixtures__', 'invalid', file))).rejects.toThrow()
+        await expect(() => reader.read(join(__dirname, '__fixtures__', 'invalid', file))).rejects.toThrow(
+          /Markdown error:/,
+        )
       })
     }
   })

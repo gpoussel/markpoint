@@ -427,6 +427,66 @@ exports[`MarkdownReader > read > should read the valid/list.md markdown file and
 }
 `;
 
+exports[`MarkdownReader > read > should read the valid/separator.md markdown file and return the parsed content 1`] = `
+{
+  "filename": "separator.md",
+  "metadata": undefined,
+  "sections": [
+    {
+      "slides": [
+        {
+          "content": [
+            {
+              "code": "{}",
+              "language": "json",
+              "type": "code",
+            },
+          ],
+          "title": [
+            {
+              "bold": false,
+              "italic": false,
+              "monospace": false,
+              "text": "Section 1 - Code",
+              "url": undefined,
+            },
+          ],
+        },
+        {
+          "content": [
+            {
+              "code": "{}",
+              "language": "yaml",
+              "type": "code",
+            },
+          ],
+          "title": [
+            {
+              "bold": false,
+              "italic": false,
+              "monospace": false,
+              "text": "Section 1 - Code",
+              "url": undefined,
+            },
+          ],
+        },
+      ],
+      "summary": undefined,
+      "title": [
+        {
+          "bold": false,
+          "italic": false,
+          "monospace": false,
+          "text": "Section 1",
+          "url": undefined,
+        },
+      ],
+    },
+  ],
+  "title": "Presentation Title",
+}
+`;
+
 exports[`MarkdownReader > read > should read the valid/simple.md markdown file and return the parsed content 1`] = `
 {
   "filename": "simple.md",

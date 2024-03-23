@@ -41,7 +41,9 @@ function convertContentToTextPart(
         return convertContentToTextPart(node.children, { ...inheritedStyle, url: node.url })
       }
       default: {
-        throw new Error(`Unsupported content type at line ${node.position?.start.line} (found '${node.type}')`)
+        throw new Error(
+          `Markdown error: unsupported content type at line ${node.position?.start.line} (found '${node.type}')`,
+        )
       }
     }
   })
@@ -59,11 +61,15 @@ function convertListToSlideContent(node: List, level: MarkdownListLevel = 0): Ma
         })
       } else if (child.type === 'list') {
         if (level === 4) {
-          throw new Error(`List level cannot be greater than 4 at line ${listItem.position?.start.line}`)
+          throw new Error(
+            `Markdown error: list level cannot be greater than 4 at line ${listItem.position?.start.line}`,
+          )
         }
         textContents.push(...convertListToSlideContent(child, (level + 1) as MarkdownListLevel))
       } else {
-        throw new Error(`Unsupported list item child type: ${child.type} at line ${child.position?.start.line}`)
+        throw new Error(
+          `Markdown error: unsupported list item child type: ${child.type} at line ${child.position?.start.line}`,
+        )
       }
     }
 
@@ -82,9 +88,6 @@ function convertContentToSlideContent(node: RootContent, level: MarkdownListLeve
     ]
   }
   if (node.type === 'code') {
-    if (!node.lang) {
-      throw new Error(`Code block language must be set at line ${node.position?.start.line}`)
-    }
     let language: MarkdownCodeLanguage | undefined
     switch (node.lang) {
       case 'yaml':
@@ -102,7 +105,7 @@ function convertContentToSlideContent(node: RootContent, level: MarkdownListLeve
       }
       default: {
         throw new Error(
-          `Code block language is not supported at line ${node.position?.start.line} (found '${node.lang}')`,
+          `Markdown error: code block language is not supported at line ${node.position?.start.line} (found '${node.lang}')`,
         )
       }
     }
@@ -117,7 +120,7 @@ function convertContentToSlideContent(node: RootContent, level: MarkdownListLeve
   if (node.type === 'list') {
     return convertListToSlideContent(node, (level + 1) as MarkdownListLevel)
   }
-  throw new Error(`Unsupported node type: ${node.type} at line ${node.position?.start.line}`)
+  throw new Error(`Markdown error: unsupported node type: ${node.type} at line ${node.position?.start.line}`)
 }
 
 export function convertMarkdownSections(root: Root): MarkdownSection[] {
@@ -126,22 +129,23 @@ export function convertMarkdownSections(root: Root): MarkdownSection[] {
   const heading2Parts = splitParts(
     root.children,
     (node): node is Heading => node.type === 'heading' && node.depth === 2,
-    false,
   )
+  if (heading2Parts.initialParts.length > 0) {
+    throw new Error(`Markdown error: unsupported content type before first section`)
+  }
+
   for (const heading2Part of heading2Parts.parts) {
     const heading2 = heading2Part.splitter
     const content = heading2Part.subparts
-    const heading3Parts = splitParts(
-      content,
-      (node): node is Heading => node.type === 'heading' && node.depth === 3,
-      true,
-    )
+    const heading3Parts = splitParts(content, (node): node is Heading => node.type === 'heading' && node.depth === 3)
 
     const paragraphsOfSummary = heading3Parts.initialParts.filter(
       (node): node is Paragraph => node.type === 'paragraph',
     )
     if (paragraphsOfSummary.length !== heading3Parts.initialParts.length) {
-      throw new Error(`Unsupported content type as section summary at line ${heading2.position?.start.line}`)
+      throw new Error(
+        `Markdown error: unsupported content type as section summary at line ${heading2.position?.start.line}`,
+      )
     }
 
     const summary =
@@ -152,24 +156,16 @@ export function convertMarkdownSections(root: Root): MarkdownSection[] {
     const slides: MarkdownSlide[] = []
     for (const heading3Part of heading3Parts.parts) {
       const slideTitle = convertContentToTextPart(heading3Part.splitter.children)
-      if (heading3Part.subparts.length === 0) {
+      const slideParts = splitParts(
+        heading3Part.subparts,
+        (node): node is ThematicBreak => node.type === 'thematicBreak',
+      )
+      const slidesContent = [slideParts.initialParts, ...slideParts.parts.map((sp) => sp.subparts)]
+      for (const slideContent of slidesContent) {
         slides.push({
           title: slideTitle,
-          content: [],
+          content: slideContent.flatMap((slideContentEntry) => convertContentToSlideContent(slideContentEntry)),
         })
-      } else {
-        const slideParts = splitParts(
-          heading3Part.subparts,
-          (node): node is ThematicBreak => node.type === 'thematicBreak',
-          true,
-        )
-        const slidesContent = [slideParts.initialParts, ...slideParts.parts.map((sp) => sp.subparts)]
-        for (const slideContent of slidesContent) {
-          slides.push({
-            title: slideTitle,
-            content: slideContent.flatMap((slideContentEntry) => convertContentToSlideContent(slideContentEntry)),
-          })
-        }
       }
     }
 
