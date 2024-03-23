@@ -1,7 +1,7 @@
 import type { Root } from 'mdast'
 import { describe, it } from 'vitest'
 
-import { extractTitle } from '../src/title'
+import { extractTitle } from '../libs/title'
 
 describe('extractTitle', () => {
   it('should throw an error if the tree is empty', ({ expect }) => {

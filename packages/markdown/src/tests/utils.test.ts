@@ -1,6 +1,6 @@
 import { describe, it } from 'vitest'
 
-import { splitParts, extractFirst } from '../src/utils'
+import { splitParts, extractFirst } from '../libs/utils'
 
 const elementIsThree = (element: number): element is number => element === 3
 

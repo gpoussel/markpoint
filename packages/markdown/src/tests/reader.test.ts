@@ -3,7 +3,7 @@ import { join } from 'node:path'
 
 import { describe, it } from 'vitest'
 
-import { MarkdownReader } from '../src'
+import { MarkdownReader } from '../'
 
 describe('MarkdownReader', () => {
   const reader = new MarkdownReader()
