@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/api/schema/stryker-core.json",
+  "packageManager": "pnpm",
+  "reporters": ["html", "clear-text", "progress"],
+  "testRunner": "vitest",
+  "coverageAnalysis": "perTest",
+  "plugins": ["@stryker-mutator/vitest-runner", "@stryker-mutator/typescript-checker"],
+  "mutate": ["packages/*/{src,lib}/**/!(*.+(s|S)pec|*.+(t|T)est).+(cjs|mjs|js|ts|mts|cts|jsx|tsx|html|vue|svelte)"],
+  "checkers": ["typescript"],
+  "tsconfigFile": "tsconfig.json",
+  "typescriptChecker": {
+    "prioritizePerformanceOverAccuracy": true
+  }
+}

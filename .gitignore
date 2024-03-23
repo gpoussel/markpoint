@@ -3,6 +3,7 @@
 .eslintcache
 .idea
 .next
+.stryker-tmp
 .turbo
 .vercel
 .vscode/*
@@ -28,6 +29,7 @@ npm-debug.log*
 out
 pnpm-debug.log*
 releases
+reports
 test-results
 yarn-debug.log*
 yarn-error.log*
