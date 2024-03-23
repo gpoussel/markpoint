@@ -5,5 +5,5 @@
     "noEmit": true,
     "target": "ESNext"
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "tests/**/*"]
 }

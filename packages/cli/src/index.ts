@@ -1,8 +1,8 @@
 import { cac } from 'cac'
 
-import { analyzePowerpoint } from './commands/analyze-pptx.js'
-import { sampleMarkdownReading } from './commands/demo-md.js'
-import { samplePowerpointGeneration } from './commands/demo-pptx.js'
+import { analyzePowerpoint } from './libs/commands/analyze-pptx.js'
+import { sampleMarkdownReading } from './libs/commands/demo-md.js'
+import { samplePowerpointGeneration } from './libs/commands/demo-pptx.js'
 
 async function main() {
   const cli = cac('markpoint-cli')
