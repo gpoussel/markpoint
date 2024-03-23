@@ -1,0 +1,520 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`MarkdownReader > read > should read the valid/code.md markdown file and return the parsed content 1`] = `
+{
+  "filename": "code.md",
+  "metadata": undefined,
+  "sections": [
+    {
+      "slides": [
+        {
+          "content": [
+            {
+              "code": "No language set",
+              "language": "text",
+              "type": "code",
+            },
+            {
+              "code": "title: YAML set",
+              "language": "yaml",
+              "type": "code",
+            },
+            {
+              "code": "title: YAML set (alternative)",
+              "language": "yaml",
+              "type": "code",
+            },
+            {
+              "code": "{ "title": "JSON set" }",
+              "language": "json",
+              "type": "code",
+            },
+          ],
+          "title": [
+            {
+              "bold": false,
+              "italic": false,
+              "monospace": false,
+              "text": "Section 1 - Basic code",
+              "url": undefined,
+            },
+          ],
+        },
+      ],
+      "summary": undefined,
+      "title": [
+        {
+          "bold": false,
+          "italic": false,
+          "monospace": false,
+          "text": "Section 1",
+          "url": undefined,
+        },
+      ],
+    },
+  ],
+  "title": "Presentation Title",
+}
+`;
+
+exports[`MarkdownReader > read > should read the valid/empty-slide.md markdown file and return the parsed content 1`] = `
+{
+  "filename": "empty-slide.md",
+  "metadata": undefined,
+  "sections": [
+    {
+      "slides": [
+        {
+          "content": [],
+          "title": [
+            {
+              "bold": false,
+              "italic": false,
+              "monospace": false,
+              "text": "Section 1 - Empty 1",
+              "url": undefined,
+            },
+          ],
+        },
+        {
+          "content": [],
+          "title": [
+            {
+              "bold": false,
+              "italic": false,
+              "monospace": false,
+              "text": "Section 1 - Empty 2",
+              "url": undefined,
+            },
+          ],
+        },
+      ],
+      "summary": undefined,
+      "title": [
+        {
+          "bold": false,
+          "italic": false,
+          "monospace": false,
+          "text": "Section 1",
+          "url": undefined,
+        },
+      ],
+    },
+  ],
+  "title": "Presentation Title",
+}
+`;
+
+exports[`MarkdownReader > read > should read the valid/formatting.md markdown file and return the parsed content 1`] = `
+{
+  "filename": "formatting.md",
+  "metadata": undefined,
+  "sections": [
+    {
+      "slides": [
+        {
+          "content": [
+            {
+              "level": 0,
+              "text": [
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "Paragraph with ",
+                  "url": undefined,
+                },
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": true,
+                  "text": "inline code",
+                  "url": undefined,
+                },
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": ", ",
+                  "url": undefined,
+                },
+                {
+                  "bold": true,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "bold",
+                  "url": undefined,
+                },
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": ", ",
+                  "url": undefined,
+                },
+                {
+                  "bold": false,
+                  "italic": true,
+                  "monospace": false,
+                  "text": "italic",
+                  "url": undefined,
+                },
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": ", ",
+                  "url": undefined,
+                },
+                {
+                  "bold": true,
+                  "italic": true,
+                  "monospace": false,
+                  "text": "bold/italic",
+                  "url": undefined,
+                },
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": " and even a ",
+                  "url": undefined,
+                },
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "link",
+                  "url": "https://example.com/",
+                },
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": ".",
+                  "url": undefined,
+                },
+              ],
+              "type": "text",
+            },
+          ],
+          "title": [
+            {
+              "bold": false,
+              "italic": false,
+              "monospace": false,
+              "text": "Section 1 - Formatting",
+              "url": undefined,
+            },
+          ],
+        },
+      ],
+      "summary": undefined,
+      "title": [
+        {
+          "bold": false,
+          "italic": false,
+          "monospace": false,
+          "text": "Section 1",
+          "url": undefined,
+        },
+      ],
+    },
+  ],
+  "title": "Presentation Title",
+}
+`;
+
+exports[`MarkdownReader > read > should read the valid/frontmatter.md markdown file and return the parsed content 1`] = `
+{
+  "filename": "frontmatter.md",
+  "metadata": {
+    "author": "John DOE",
+    "company": "Acme, Inc.",
+    "date": "28/06/1991",
+    "issue": "A",
+    "reference": "123456_2024",
+  },
+  "sections": [
+    {
+      "slides": [
+        {
+          "content": [
+            {
+              "code": "{}",
+              "language": "json",
+              "type": "code",
+            },
+          ],
+          "title": [
+            {
+              "bold": false,
+              "italic": false,
+              "monospace": false,
+              "text": "Section 1 - Code",
+              "url": undefined,
+            },
+          ],
+        },
+      ],
+      "summary": undefined,
+      "title": [
+        {
+          "bold": false,
+          "italic": false,
+          "monospace": false,
+          "text": "Section 1",
+          "url": undefined,
+        },
+      ],
+    },
+  ],
+  "title": "Presentation Title",
+}
+`;
+
+exports[`MarkdownReader > read > should read the valid/list.md markdown file and return the parsed content 1`] = `
+{
+  "filename": "list.md",
+  "metadata": undefined,
+  "sections": [
+    {
+      "slides": [
+        {
+          "content": [
+            {
+              "level": 0,
+              "text": [
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "Outside bullet",
+                  "url": undefined,
+                },
+              ],
+              "type": "text",
+            },
+            {
+              "level": 1,
+              "text": [
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "First bullet 1",
+                  "url": undefined,
+                },
+              ],
+              "type": "text",
+            },
+            {
+              "level": 2,
+              "text": [
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "Inside bullet 1",
+                  "url": undefined,
+                },
+              ],
+              "type": "text",
+            },
+            {
+              "level": 3,
+              "text": [
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "Again bullet 1",
+                  "url": undefined,
+                },
+              ],
+              "type": "text",
+            },
+            {
+              "level": 4,
+              "text": [
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "Final bullet 1",
+                  "url": undefined,
+                },
+              ],
+              "type": "text",
+            },
+            {
+              "level": 3,
+              "text": [
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "Again bullet 2",
+                  "url": undefined,
+                },
+              ],
+              "type": "text",
+            },
+            {
+              "level": 2,
+              "text": [
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "Inside bullet 2",
+                  "url": undefined,
+                },
+              ],
+              "type": "text",
+            },
+            {
+              "level": 1,
+              "text": [
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "First bullet 2",
+                  "url": undefined,
+                },
+              ],
+              "type": "text",
+            },
+            {
+              "level": 0,
+              "text": [
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "Last paragraph",
+                  "url": undefined,
+                },
+              ],
+              "type": "text",
+            },
+          ],
+          "title": [
+            {
+              "bold": false,
+              "italic": false,
+              "monospace": false,
+              "text": "Section 1 - List",
+              "url": undefined,
+            },
+          ],
+        },
+      ],
+      "summary": undefined,
+      "title": [
+        {
+          "bold": false,
+          "italic": false,
+          "monospace": false,
+          "text": "Section 1",
+          "url": undefined,
+        },
+      ],
+    },
+  ],
+  "title": "Presentation Title",
+}
+`;
+
+exports[`MarkdownReader > read > should read the valid/simple.md markdown file and return the parsed content 1`] = `
+{
+  "filename": "simple.md",
+  "metadata": undefined,
+  "sections": [
+    {
+      "slides": [
+        {
+          "content": [
+            {
+              "code": "{}",
+              "language": "json",
+              "type": "code",
+            },
+          ],
+          "title": [
+            {
+              "bold": false,
+              "italic": false,
+              "monospace": false,
+              "text": "Section 1 - Code",
+              "url": undefined,
+            },
+          ],
+        },
+      ],
+      "summary": undefined,
+      "title": [
+        {
+          "bold": false,
+          "italic": false,
+          "monospace": false,
+          "text": "Section 1",
+          "url": undefined,
+        },
+      ],
+    },
+  ],
+  "title": "Presentation Title",
+}
+`;
+
+exports[`MarkdownReader > read > should read the valid/summary.md markdown file and return the parsed content 1`] = `
+{
+  "filename": "summary.md",
+  "metadata": undefined,
+  "sections": [
+    {
+      "slides": [
+        {
+          "content": [
+            {
+              "code": "{}",
+              "language": "json",
+              "type": "code",
+            },
+          ],
+          "title": [
+            {
+              "bold": false,
+              "italic": false,
+              "monospace": false,
+              "text": "Section 1 - Code",
+              "url": undefined,
+            },
+          ],
+        },
+      ],
+      "summary": [
+        {
+          "bold": false,
+          "italic": false,
+          "monospace": false,
+          "text": "This is the summary for section 1",
+          "url": undefined,
+        },
+      ],
+      "title": [
+        {
+          "bold": false,
+          "italic": false,
+          "monospace": false,
+          "text": "Section 1",
+          "url": undefined,
+        },
+      ],
+    },
+  ],
+  "title": "Presentation Title",
+}
+`;

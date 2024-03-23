@@ -49,9 +49,6 @@ function convertContentToTextPart(
 
 function convertListToSlideContent(node: List, level: MarkdownListLevel = 0): MarkdownTextContent[] {
   return node.children.flatMap((listItem) => {
-    if (listItem.checked) {
-      throw new Error(`List item checked property must be undefined at line ${listItem.position?.start.line}`)
-    }
     const textContents: MarkdownTextContent[] = []
     for (const child of listItem.children) {
       if (child.type === 'paragraph') {

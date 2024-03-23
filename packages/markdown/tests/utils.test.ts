@@ -1,11 +1,13 @@
-import { expect, describe, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 import { splitParts, extractFirst } from '../src/utils'
 
 const elementIsThree = (element: number): element is number => element === 3
 
 describe('splitParts', () => {
-  it('should split the array into parts based on the splitPredicate (when acceptInitialParts is true)', () => {
+  it('should split the array into parts based on the splitPredicate (when acceptInitialParts is true)', ({
+    expect,
+  }) => {
     const result = splitParts([1, 2, 3, 4, 5, 3, 4, 6], elementIsThree, true)
 
     expect(result).toEqual({
@@ -17,7 +19,9 @@ describe('splitParts', () => {
     })
   })
 
-  it('should split the array into parts based on the splitPredicate (when acceptInitialParts is false)', () => {
+  it('should split the array into parts based on the splitPredicate (when acceptInitialParts is false)', ({
+    expect,
+  }) => {
     const result = splitParts([3, 4, 5, 3, 4, 6], elementIsThree, false)
 
     expect(result).toEqual({
@@ -28,13 +32,13 @@ describe('splitParts', () => {
     })
   })
 
-  it('should throw an error if acceptInitialParts is false and there is an unexpected element', () => {
+  it('should throw an error if acceptInitialParts is false and there is an unexpected element', ({ expect }) => {
     expect(() => splitParts([1, 2, 3, 4, 5, 3, 4, 6], elementIsThree, false)).toThrowError()
   })
 })
 
 describe('extractFirst', () => {
-  it('should extract the first element if it matches the predicate', () => {
+  it('should extract the first element if it matches the predicate', ({ expect }) => {
     const array = [3, 4, 5]
     const result = extractFirst(array, elementIsThree, true)
 
@@ -42,7 +46,9 @@ describe('extractFirst', () => {
     expect(array).toEqual([4, 5])
   })
 
-  it('should return undefined if the first element does not match the predicate and mandatory is false', () => {
+  it('should return undefined if the first element does not match the predicate and mandatory is false', ({
+    expect,
+  }) => {
     const array = [1, 2, 3, 4, 5]
     const result = extractFirst(array, elementIsThree, false)
 
@@ -50,20 +56,20 @@ describe('extractFirst', () => {
     expect(array).toEqual([1, 2, 3, 4, 5])
   })
 
-  it('should throw an error if the first element does not match the predicate and mandatory is true', () => {
+  it('should throw an error if the first element does not match the predicate and mandatory is true', ({ expect }) => {
     const array = [1, 2, 3, 4, 5]
 
     expect(() => extractFirst(array, elementIsThree, true)).toThrowError()
   })
 
-  it('should return undefined if the array is empty and mandatory is false', () => {
+  it('should return undefined if the array is empty and mandatory is false', ({ expect }) => {
     const result = extractFirst([], elementIsThree, false)
 
     expect(result).toBeUndefined()
     expect([]).toEqual([])
   })
 
-  it('should throw an error if the array is empty and mandatory is true', () => {
+  it('should throw an error if the array is empty and mandatory is true', ({ expect }) => {
     expect(() => extractFirst([], elementIsThree, true)).toThrowError()
   })
 })

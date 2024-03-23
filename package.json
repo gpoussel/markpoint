@@ -12,7 +12,8 @@
     "lint": "turbo run lint",
     "prepare": "husky",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@hideoo/eslint-config": "3.0.1",

@@ -1,10 +1,10 @@
 import type { Root } from 'mdast'
-import { expect, describe, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 import { extractFrontMatter } from '../src/frontmatter'
 
 describe('extractFrontMatter', () => {
-  it('should return undefined if the document is empty', () => {
+  it('should return undefined if the document is empty', ({ expect }) => {
     const tree: Root = {
       type: 'root',
       children: [],
@@ -14,7 +14,7 @@ describe('extractFrontMatter', () => {
     expect(tree.children).toHaveLength(0)
   })
 
-  it('should return undefined if there is no YAML frontmatter', () => {
+  it('should return undefined if there is no YAML frontmatter', ({ expect }) => {
     const tree: Root = {
       type: 'root',
       children: [
@@ -35,7 +35,7 @@ describe('extractFrontMatter', () => {
     expect(tree.children[0].type).toBe('paragraph')
   })
 
-  it('should parse and return the frontmatter object if YAML frontmatter exists', () => {
+  it('should parse and return the frontmatter object if YAML frontmatter exists', ({ expect }) => {
     const tree: Root = {
       type: 'root',
       children: [

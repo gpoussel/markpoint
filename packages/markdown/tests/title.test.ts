@@ -1,16 +1,16 @@
 import type { Root } from 'mdast'
-import { expect, describe, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 import { extractTitle } from '../src/title'
 
 describe('extractTitle', () => {
-  it('should throw an error if the tree is empty', () => {
+  it('should throw an error if the tree is empty', ({ expect }) => {
     const tree: Root = { type: 'root', children: [] }
     expect(() => extractTitle(tree)).toThrowError()
     expect(tree.children).toHaveLength(0)
   })
 
-  it('should throw an error if the first document element is not a heading', () => {
+  it('should throw an error if the first document element is not a heading', ({ expect }) => {
     const tree: Root = {
       type: 'root',
       children: [{ type: 'paragraph', children: [{ type: 'text', value: 'Some content' }] }],
@@ -19,7 +19,7 @@ describe('extractTitle', () => {
     expect(tree.children).toHaveLength(1)
   })
 
-  it('should throw an error if the first heading is not a level 1 heading', () => {
+  it('should throw an error if the first heading is not a level 1 heading', ({ expect }) => {
     const tree: Root = {
       type: 'root',
       children: [{ type: 'heading', depth: 2, children: [{ type: 'text', value: 'Title' }] }],
@@ -27,7 +27,7 @@ describe('extractTitle', () => {
     expect(() => extractTitle(tree)).toThrowError()
   })
 
-  it('should throw an error if the first heading has no child', () => {
+  it('should throw an error if the first heading has no child', ({ expect }) => {
     const tree: Root = {
       type: 'root',
       children: [
@@ -41,7 +41,7 @@ describe('extractTitle', () => {
     expect(() => extractTitle(tree)).toThrowError()
   })
 
-  it('should throw an error if the first heading has more than one child', () => {
+  it('should throw an error if the first heading has more than one child', ({ expect }) => {
     const tree: Root = {
       type: 'root',
       children: [
@@ -58,7 +58,7 @@ describe('extractTitle', () => {
     expect(() => extractTitle(tree)).toThrowError()
   })
 
-  it('should throw an error if the first heading contains no text', () => {
+  it('should throw an error if the first heading contains no text', ({ expect }) => {
     const tree: Root = {
       type: 'root',
       children: [
@@ -72,7 +72,7 @@ describe('extractTitle', () => {
     expect(() => extractTitle(tree)).toThrowError()
   })
 
-  it('should extract and return the title from the first heading', () => {
+  it('should extract and return the title from the first heading', ({ expect }) => {
     const tree: Root = {
       type: 'root',
       children: [

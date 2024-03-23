@@ -1,5 +1,9 @@
+import z from 'zod'
+
 export interface MarkdownPresentation {
   filename: string
+  title: string
+  metadata: FrontmatterAttributes | undefined
   sections: MarkdownSection[]
 }
 
@@ -40,3 +44,13 @@ export interface MarkdownTextContent {
 export type MarkdownMixedContent = MarkdownCodeContent | MarkdownTextContent
 
 export type SingleLineText = TextPart[]
+
+export const FrontmatterObjectType = z.object({
+  company: z.string().optional(),
+  author: z.string().optional(),
+  date: z.string().optional(),
+  issue: z.string().optional(),
+  reference: z.string().optional(),
+})
+
+export type FrontmatterAttributes = z.infer<typeof FrontmatterObjectType>
