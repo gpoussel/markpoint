@@ -52,7 +52,6 @@ export interface PowerpointSlidesConfiguration {
 }
 
 export interface PowerpointPresentationDefinition {
-  master: PowerpointPartDefinition[]
   slides: PowerpointSlidesConfiguration[]
 }
 

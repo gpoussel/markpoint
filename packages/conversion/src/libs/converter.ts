@@ -57,7 +57,6 @@ export class MarkpointConverter {
           subject: presentation.title,
         },
         presentation: {
-          master: [], // TODO: Use data from presentation
           slides: [], // TODO: Use data from presentation
         },
         template: powerpointDefinition,

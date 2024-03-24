@@ -68,7 +68,8 @@ export class PowerpointWriter {
   }
 
   private async buildImagePaths(definition: PowerpointPresentationDefinition, workingDirectory: string) {
-    const imageOriginalPaths = [...definition.master, ...definition.slides.flatMap((slide) => slide.parts)]
+    const imageOriginalPaths = definition.slides
+      .flatMap((slide) => slide.parts)
       .map((partDefinition) => partDefinition.content)
       .filter((partDefinition): partDefinition is PowerpointPicturePartContent => partDefinition.type === 'picture')
       .map((image) => image.path)

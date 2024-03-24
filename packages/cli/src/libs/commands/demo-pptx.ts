@@ -3,16 +3,14 @@ import path from 'node:path'
 import {
   PowerpointWriter,
   type PowerpointGenerationConfiguration,
-  type PowerpointPartDefinition,
-  type PowerpointPresentationDefinition,
   type PowerpointSlidesConfiguration,
   type PresentationMetadata,
+  type PowerpointPresentationDefinition,
 } from '@markpoint/powerpoint'
 import type { TemplateDefinition } from '@markpoint/shared'
 
 const sampleAuthor = 'Presentation Author'
 const sampleTitle = 'Lorem Ipsum Title'
-const sampleDate = '28/06/2024'
 
 const metadata: PresentationMetadata = {
   company: 'Acme Inc.',
@@ -168,17 +166,7 @@ calling-birds:
     parts: [],
   },
 ]
-const master: PowerpointPartDefinition[] = [
-  {
-    name: 'footer',
-    content: {
-      type: 'line',
-      text: [sampleTitle, sampleAuthor, sampleDate].join(' | '),
-    },
-  },
-]
 const presentation: PowerpointPresentationDefinition = {
-  master,
   slides,
 }
 const configuration: PowerpointGenerationConfiguration = {
