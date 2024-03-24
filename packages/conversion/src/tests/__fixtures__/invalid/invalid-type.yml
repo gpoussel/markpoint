@@ -1,0 +1,10 @@
+baseFile: ../example.pptx
+layouts:
+  - name: end
+    baseSlideNumber: 63
+    parts: []
+master:
+  elements:
+    - name: footer
+      type: invalid_type
+      creationId: '{62086BA9-1591-C6CD-E573-A5F8961683B1}'
