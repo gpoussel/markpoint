@@ -1,10 +1,10 @@
 import type { MarkdownPresentation } from '@markpoint/markdown'
 import { PowerpointWriter } from '@markpoint/powerpoint'
-import type { PowerpointTemplateConfiguration } from '@markpoint/shared'
+import type { TemplateConfiguration } from '@markpoint/shared'
 
 export class MarkpointConverter {
   public async convert(
-    templateConfiguration: PowerpointTemplateConfiguration,
+    templateConfiguration: TemplateConfiguration,
     presentation: MarkdownPresentation,
     outputFile: string,
   ): Promise<void> {

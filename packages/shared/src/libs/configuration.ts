@@ -1,25 +1,25 @@
 import z from 'zod'
 
-export const PowerpointTemplateElementSchema = z.object({
+export const TemplateElementConfigurationSchema = z.object({
   name: z.string(),
   creationId: z.string(),
   type: z.union([z.literal('line'), z.literal('picture'), z.literal('text')]),
 })
 
-export const PowerpointTemplateLayoutSchema = z.object({
+export const TemplateLayoutConfigurationSchema = z.object({
   name: z.string(),
   baseSlideNumber: z.number(),
-  elements: z.array(PowerpointTemplateElementSchema),
+  elements: z.array(TemplateElementConfigurationSchema),
 })
 
-export const PowerpointTemplateConfigurationSchema = z.object({
+export const TemplateConfigurationSchema = z.object({
   baseFile: z.string(),
   master: z.object({
-    elements: z.array(PowerpointTemplateElementSchema),
+    elements: z.array(TemplateElementConfigurationSchema),
   }),
-  layouts: z.array(PowerpointTemplateLayoutSchema),
+  layouts: z.array(TemplateLayoutConfigurationSchema),
 })
 
-export type PowerpointTemplateConfiguration = z.infer<typeof PowerpointTemplateConfigurationSchema>
-export type PowerpointTemplateLayout = z.infer<typeof PowerpointTemplateLayoutSchema>
-export type PowerpointTemplateElement = z.infer<typeof PowerpointTemplateElementSchema>
+export type TemplateConfiguration = z.infer<typeof TemplateConfigurationSchema>
+export type TemplateLayoutConfiguration = z.infer<typeof TemplateLayoutConfigurationSchema>
+export type TemplateElementConfiguration = z.infer<typeof TemplateElementConfigurationSchema>

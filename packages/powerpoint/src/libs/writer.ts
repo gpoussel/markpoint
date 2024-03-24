@@ -2,7 +2,7 @@
 import { copyFile, rm } from 'node:fs/promises'
 import path from 'node:path'
 
-import type { PowerpointTemplateElement } from '@markpoint/shared'
+import type { TemplateElementConfiguration } from '@markpoint/shared'
 import PPTX, { type Presentation } from 'nodejs-pptx'
 import {
   Automizer,
@@ -156,7 +156,7 @@ export class PowerpointWriter {
   }
 
   private fillPartContent(
-    parts: PowerpointTemplateElement[],
+    parts: TemplateElementConfiguration[],
     definitions: PowerpointPartDefinition[],
     object: IMaster | ISlide,
     imagePaths: Record<string, string>,

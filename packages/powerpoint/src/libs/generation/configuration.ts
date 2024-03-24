@@ -1,4 +1,4 @@
-import type { PowerpointTemplateConfiguration } from '@markpoint/shared'
+import type { TemplateConfiguration } from '@markpoint/shared'
 
 export interface PresentationMetadata {
   title: string
@@ -58,6 +58,6 @@ export interface PowerpointPresentationDefinition {
 
 export interface PowerpointGenerationConfiguration {
   metadata: PresentationMetadata
-  template: PowerpointTemplateConfiguration
+  template: TemplateConfiguration
   presentation: PowerpointPresentationDefinition
 }

@@ -8,7 +8,7 @@ import {
   type PowerpointSlidesConfiguration,
   type PresentationMetadata,
 } from '@markpoint/powerpoint'
-import type { PowerpointTemplateConfiguration } from '@markpoint/shared'
+import type { TemplateConfiguration } from '@markpoint/shared'
 
 const sampleAuthor = 'Presentation Author'
 const sampleTitle = 'Lorem Ipsum Title'
@@ -20,7 +20,7 @@ const metadata: PresentationMetadata = {
   title: sampleTitle,
   subject: 'Presentation Subject',
 }
-const template: PowerpointTemplateConfiguration = {
+const template: TemplateConfiguration = {
   baseFile: './template.pptx',
   layouts: [
     {
