@@ -428,6 +428,48 @@ exports[`MarkdownReader > read > should read the valid/list.md markdown file and
 }
 `;
 
+exports[`MarkdownReader > read > should read the valid/no-h3.md markdown file and return the parsed content 1`] = `
+{
+  "filename": "no-h3.md",
+  "metadata": undefined,
+  "sections": [
+    {
+      "slides": [
+        {
+          "content": [
+            {
+              "level": 0,
+              "text": [
+                {
+                  "bold": false,
+                  "italic": false,
+                  "monospace": false,
+                  "text": "Content (not summary)",
+                  "url": undefined,
+                },
+              ],
+              "type": "text",
+            },
+          ],
+          "title": undefined,
+        },
+      ],
+      "summary": undefined,
+      "title": [
+        {
+          "bold": false,
+          "italic": false,
+          "monospace": false,
+          "text": "Section 1",
+          "url": undefined,
+        },
+      ],
+    },
+  ],
+  "title": "Presentation Title",
+}
+`;
+
 exports[`MarkdownReader > read > should read the valid/separator.md markdown file and return the parsed content 1`] = `
 {
   "filename": "separator.md",

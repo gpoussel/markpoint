@@ -14,7 +14,7 @@ export interface MarkdownSection {
 }
 
 export interface MarkdownSlide {
-  title: SingleLineText
+  title: SingleLineText | undefined
   content: MarkdownMixedContent[]
 }
 

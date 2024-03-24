@@ -139,33 +139,42 @@ export function convertMarkdownSections(root: Root): MarkdownSection[] {
     const content = heading2Part.subparts
     const heading3Parts = splitParts(content, (node): node is Heading => node.type === 'heading' && node.depth === 3)
 
-    const paragraphsOfSummary = heading3Parts.initialParts.filter(
-      (node): node is Paragraph => node.type === 'paragraph',
-    )
-    if (paragraphsOfSummary.length !== heading3Parts.initialParts.length) {
-      throw new Error(
-        `Markdown error: unsupported content type as section summary at line ${heading2.position?.start.line}`,
-      )
-    }
-
-    const summary =
-      paragraphsOfSummary.length > 0
-        ? convertContentToTextPart(paragraphsOfSummary.flatMap((paragraph) => paragraph.children))
-        : undefined
-
+    let summary: SingleLineText | undefined
     const slides: MarkdownSlide[] = []
-    for (const heading3Part of heading3Parts.parts) {
-      const slideTitle = convertContentToTextPart(heading3Part.splitter.children)
-      const slideParts = splitParts(
-        heading3Part.subparts,
-        (node): node is ThematicBreak => node.type === 'thematicBreak',
+    if (heading3Parts.parts.length === 0) {
+      // When no heading 3 is found, the section is considered as a single slide (and no summary)
+      slides.push({
+        title: undefined,
+        content: heading3Parts.initialParts.flatMap((slideContentEntry) =>
+          convertContentToSlideContent(slideContentEntry),
+        ),
+      })
+    } else {
+      const paragraphsOfSummary = heading3Parts.initialParts.filter(
+        (node): node is Paragraph => node.type === 'paragraph',
       )
-      const slidesContent = [slideParts.initialParts, ...slideParts.parts.map((sp) => sp.subparts)]
-      for (const slideContent of slidesContent) {
-        slides.push({
-          title: slideTitle,
-          content: slideContent.flatMap((slideContentEntry) => convertContentToSlideContent(slideContentEntry)),
-        })
+      if (paragraphsOfSummary.length !== heading3Parts.initialParts.length) {
+        throw new Error(
+          `Markdown error: unsupported content type as section summary at line ${heading2.position?.start.line} (found ${heading3Parts.initialParts.length} initial parts, ${paragraphsOfSummary.length} paragraphs)`,
+        )
+      }
+      if (paragraphsOfSummary.length > 0) {
+        summary = convertContentToTextPart(paragraphsOfSummary.flatMap((paragraph) => paragraph.children))
+      }
+
+      for (const heading3Part of heading3Parts.parts) {
+        const slideTitle = convertContentToTextPart(heading3Part.splitter.children)
+        const slideParts = splitParts(
+          heading3Part.subparts,
+          (node): node is ThematicBreak => node.type === 'thematicBreak',
+        )
+        const slidesContent = [slideParts.initialParts, ...slideParts.parts.map((sp) => sp.subparts)]
+        for (const slideContent of slidesContent) {
+          slides.push({
+            title: slideTitle,
+            content: slideContent.flatMap((slideContentEntry) => convertContentToSlideContent(slideContentEntry)),
+          })
+        }
       }
     }
 
