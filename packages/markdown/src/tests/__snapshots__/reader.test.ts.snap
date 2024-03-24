@@ -233,6 +233,7 @@ exports[`MarkdownReader > read > should read the valid/frontmatter.md markdown f
     "company": "Acme, Inc.",
     "date": "28/06/1991",
     "issue": "A",
+    "location": "Somewhere",
     "reference": "123456_2024",
   },
   "sections": [

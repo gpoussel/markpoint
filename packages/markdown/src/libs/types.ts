@@ -50,6 +50,7 @@ export const FrontmatterObjectType = z.object({
   author: z.string().optional(),
   date: z.string().optional(),
   issue: z.string().optional(),
+  location: z.string().optional(),
   reference: z.string().optional(),
 })
 

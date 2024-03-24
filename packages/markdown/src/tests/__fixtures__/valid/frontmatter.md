@@ -3,6 +3,7 @@ company: Acme, Inc.
 author: John DOE
 date: 28/06/1991
 issue: A
+location: Somewhere
 reference: '123456_2024'
 ---
 
