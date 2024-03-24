@@ -1,6 +1,6 @@
 import type { MarkdownPresentation } from '@markpoint/markdown'
 import { PowerpointWriter } from '@markpoint/powerpoint'
-import type { TemplateConfiguration } from '@markpoint/shared'
+import type { TemplateConfiguration, TemplateDefinition } from '@markpoint/shared'
 
 export class MarkpointConverter {
   public async convert(
@@ -9,6 +9,12 @@ export class MarkpointConverter {
     outputFile: string,
   ): Promise<void> {
     const powerpointWriter = new PowerpointWriter()
+    const powerpointDefinition: TemplateDefinition = {
+      layouts: [],
+      master: {
+        elements: [],
+      },
+    }
     await powerpointWriter.generate(
       templateConfiguration.baseFile,
       {
@@ -22,7 +28,7 @@ export class MarkpointConverter {
           master: [], // TODO: Use data from presentation
           slides: [], // TODO: Use data from presentation
         },
-        template: templateConfiguration,
+        template: powerpointDefinition,
       },
       outputFile,
     )
