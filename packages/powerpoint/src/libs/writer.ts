@@ -2,6 +2,7 @@
 import { copyFile, rm } from 'node:fs/promises'
 import path from 'node:path'
 
+import type { PowerpointTemplateElement } from '@markpoint/shared'
 import PPTX, { type Presentation } from 'nodejs-pptx'
 import {
   Automizer,
@@ -19,7 +20,6 @@ import type {
   PowerpointPartDefinition,
   PowerpointPicturePartContent,
   PowerpointPresentationDefinition,
-  PowerpointTemplatePart,
   PresentationMetadata,
 } from './generation/configuration.js'
 import { highlightCode } from './generation/highlight.js'
@@ -137,7 +137,12 @@ export class PowerpointWriter {
       presentation.loadMedia(name)
     }
     presentation.addMaster(TEMPLATE_LABEL, 1, (master) => {
-      this.fillPartContent(configuration.template.masterParts, configuration.presentation.master, master, imagePaths)
+      this.fillPartContent(
+        configuration.template.master.elements,
+        configuration.presentation.master,
+        master,
+        imagePaths,
+      )
     })
     for (const slideConfiguration of configuration.presentation.slides) {
       const layout = configuration.template.layouts.find((layout) => layout.name === slideConfiguration.layout)
@@ -145,13 +150,13 @@ export class PowerpointWriter {
         throw new Error(`Layout '${slideConfiguration.layout}' not found in template`)
       }
       presentation.addSlide(TEMPLATE_LABEL, layout.baseSlideNumber, (slide) => {
-        this.fillPartContent(layout.parts, slideConfiguration.parts, slide, imagePaths)
+        this.fillPartContent(layout.elements, slideConfiguration.parts, slide, imagePaths)
       })
     }
   }
 
   private fillPartContent(
-    parts: PowerpointTemplatePart[],
+    parts: PowerpointTemplateElement[],
     definitions: PowerpointPartDefinition[],
     object: IMaster | ISlide,
     imagePaths: Record<string, string>,

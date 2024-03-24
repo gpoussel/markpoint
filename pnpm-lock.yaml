@@ -88,6 +88,9 @@ importers:
       '@markpoint/powerpoint':
         specifier: workspace:*
         version: link:../powerpoint
+      '@markpoint/shared':
+        specifier: workspace:*
+        version: link:../shared
       yaml:
         specifier: ^2.4.1
         version: 2.4.1
@@ -131,6 +134,9 @@ importers:
 
   packages/powerpoint:
     dependencies:
+      '@markpoint/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@xmldom/xmldom':
         specifier: ^0.8.10
         version: 0.8.10
@@ -154,7 +160,11 @@ importers:
         specifier: ^3.0.4
         version: 3.0.4
 
-  packages/shared: {}
+  packages/shared:
+    dependencies:
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
 
 packages:
 

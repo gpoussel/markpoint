@@ -1,1 +1,1 @@
-export * from './libs/constants.js'
+export * from './libs/configuration.js'

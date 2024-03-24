@@ -1,23 +1,10 @@
+import type { PowerpointTemplateConfiguration } from '@markpoint/shared'
+
 export interface PresentationMetadata {
   title: string
   author: string
   company: string
   subject: string
-}
-
-export interface PowerpointTemplatePart {
-  name: string
-  creationId: string
-  type: 'line' | 'picture' | 'text'
-}
-
-export interface PresentationTemplateConfiguration {
-  masterParts: PowerpointTemplatePart[]
-  layouts: {
-    name: string
-    baseSlideNumber: number
-    parts: PowerpointTemplatePart[]
-  }[]
 }
 
 export interface PowerpointLinePartContent {
@@ -71,6 +58,6 @@ export interface PowerpointPresentationDefinition {
 
 export interface PowerpointGenerationConfiguration {
   metadata: PresentationMetadata
-  template: PresentationTemplateConfiguration
+  template: PowerpointTemplateConfiguration
   presentation: PowerpointPresentationDefinition
 }

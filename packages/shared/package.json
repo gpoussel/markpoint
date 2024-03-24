@@ -10,5 +10,8 @@
     "build": "tsc -p tsconfig.build.json",
     "lint": "prettier -c . && eslint . --cache --max-warnings=0 && tsc --noEmit",
     "lint:fix": "prettier --write ."
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
   }
 }
