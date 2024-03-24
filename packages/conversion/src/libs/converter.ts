@@ -1,14 +1,15 @@
 import type { MarkdownPresentation } from '@markpoint/markdown'
-import { PowerpointWriter } from '@markpoint/powerpoint'
+import { PowerpointWriter, type PowerpointSlidesConfiguration } from '@markpoint/powerpoint'
 import {
   StringUtils,
   type TemplateConfiguration,
   type TemplateDefinition,
   type TemplateElementConfiguration,
   type TemplateElementDefinition,
+  type TemplateLayoutConfiguration,
 } from '@markpoint/shared'
 
-export function convertElementConfigurationToDefinition(
+function convertElementConfigurationToDefinition(
   elementConfiguration: TemplateElementConfiguration,
   data: Record<string, string>,
 ): TemplateElementDefinition {
@@ -20,6 +21,16 @@ export function convertElementConfigurationToDefinition(
     }
   }
   throw new Error(`Unsupported element type: ${elementConfiguration.type}`)
+}
+
+function generateSlide(
+  layoutConfiguration: TemplateLayoutConfiguration,
+  data: Record<string, string>,
+): PowerpointSlidesConfiguration {
+  return {
+    layoutSlide: layoutConfiguration.baseSlideNumber,
+    content: layoutConfiguration.elements.map((e) => convertElementConfigurationToDefinition(e, data)),
+  }
 }
 
 export class MarkpointConverter {
@@ -47,6 +58,18 @@ export class MarkpointConverter {
         ),
       },
     }
+    const slides: PowerpointSlidesConfiguration[] = []
+    const layout = templateConfiguration.layout
+    const firstSlideLayout = layout?.document?.first
+    if (firstSlideLayout) {
+      slides.push(generateSlide(firstSlideLayout, templateData))
+    }
+
+    const lastSlideLayout = layout?.document?.last
+    if (lastSlideLayout) {
+      slides.push(generateSlide(lastSlideLayout, templateData))
+    }
+
     await powerpointWriter.generate(
       templateConfiguration.baseFile,
       {
@@ -57,7 +80,7 @@ export class MarkpointConverter {
           subject: presentation.title,
         },
         presentation: {
-          slides: [], // TODO: Use data from presentation
+          slides,
         },
         template: powerpointDefinition,
       },

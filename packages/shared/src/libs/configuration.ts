@@ -27,7 +27,7 @@ const TemplateElementConfigurationSchema = z.discriminatedUnion('type', [
 
 export const TemplateLayoutConfigurationSchema = z
   .object({
-    name: z.string(),
+    name: z.string().optional(), // TODO: remove once "layouts" is entirely replaced by "layout"
     baseSlideNumber: z.number(),
     elements: z.array(TemplateElementConfigurationSchema),
   })
@@ -36,9 +36,23 @@ export const TemplateLayoutConfigurationSchema = z
 export const TemplateConfigurationSchema = z
   .object({
     baseFile: z.string(),
-    master: z.object({
-      elements: z.array(TemplateElementConfigurationSchema),
-    }),
+    master: z
+      .object({
+        elements: z.array(TemplateElementConfigurationSchema),
+      })
+      .strict(),
+    layout: z
+      .object({
+        document: z
+          .object({
+            first: TemplateLayoutConfigurationSchema.optional(),
+            last: TemplateLayoutConfigurationSchema.optional(),
+          })
+          .strict()
+          .optional(),
+      })
+      .strict()
+      .optional(),
     layouts: z.array(TemplateLayoutConfigurationSchema),
   })
   .strict()

@@ -1,4 +1,4 @@
-import type { TemplateDefinition } from '@markpoint/shared'
+import type { TemplateElementDefinition, TemplateDefinition } from '@markpoint/shared'
 
 export interface PresentationMetadata {
   title: string
@@ -47,8 +47,8 @@ export interface PowerpointPartDefinition {
 }
 
 export interface PowerpointSlidesConfiguration {
-  layout: string
-  parts: PowerpointPartDefinition[]
+  layoutSlide: number
+  content: TemplateElementDefinition[]
 }
 
 export interface PowerpointPresentationDefinition {

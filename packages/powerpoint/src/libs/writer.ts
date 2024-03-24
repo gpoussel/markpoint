@@ -15,7 +15,6 @@ import { withDir } from 'tmp-promise'
 
 import type {
   PowerpointGenerationConfiguration,
-  PowerpointPicturePartContent,
   PowerpointPresentationDefinition,
   PresentationMetadata,
 } from './generation/configuration.js'
@@ -68,22 +67,24 @@ export class PowerpointWriter {
   }
 
   private async buildImagePaths(definition: PowerpointPresentationDefinition, workingDirectory: string) {
-    const imageOriginalPaths = definition.slides
-      .flatMap((slide) => slide.parts)
-      .map((partDefinition) => partDefinition.content)
-      .filter((partDefinition): partDefinition is PowerpointPicturePartContent => partDefinition.type === 'picture')
-      .map((image) => image.path)
-      .filter((value, index, array) => array.indexOf(value) === index)
-
-    return Object.fromEntries(
-      await Promise.all(
-        imageOriginalPaths.map(async (image) => {
-          const imageNameInWorkingDirectory = path.basename(image)
-          await copyFile(image, path.join(workingDirectory, imageNameInWorkingDirectory))
-          return [image, imageNameInWorkingDirectory]
-        }),
-      ),
-    ) as Record<string, string>
+    // eslint-disable-next-line no-console
+    console.log({ definition, workingDirectory })
+    return await new Promise<Record<string, string>>((resolve) => resolve({}))
+    // const imageOriginalPaths = definition.slides
+    //   .flatMap((slide) => slide.parts)
+    //   .map((partDefinition) => partDefinition.content)
+    //   .filter((partDefinition): partDefinition is PowerpointPicturePartContent => partDefinition.type === 'picture')
+    //   .map((image) => image.path)
+    //   .filter((value, index, array) => array.indexOf(value) === index)
+    // return Object.fromEntries(
+    //   await Promise.all(
+    //     imageOriginalPaths.map(async (image) => {
+    //       const imageNameInWorkingDirectory = path.basename(image)
+    //       await copyFile(image, path.join(workingDirectory, imageNameInWorkingDirectory))
+    //       return [image, imageNameInWorkingDirectory]
+    //     }),
+    //   ),
+    // ) as Record<string, string>
   }
 
   private async generateEmptyPresentation(outputPath: string, metadata: PresentationMetadata) {
@@ -107,12 +108,8 @@ export class PowerpointWriter {
       this.fillPartContent(configuration.template.master.elements, master, imagePaths)
     })
     for (const slideConfiguration of configuration.presentation.slides) {
-      const layout = configuration.template.layouts.find((layout) => layout.name === slideConfiguration.layout)
-      if (!layout) {
-        throw new Error(`Layout '${slideConfiguration.layout}' not found in template`)
-      }
-      presentation.addSlide(TEMPLATE_LABEL, layout.baseSlideNumber, (slide) => {
-        this.fillPartContent(layout.elements, slide, imagePaths)
+      presentation.addSlide(TEMPLATE_LABEL, slideConfiguration.layoutSlide, (slide) => {
+        this.fillPartContent(slideConfiguration.content, slide, imagePaths)
       })
     }
   }

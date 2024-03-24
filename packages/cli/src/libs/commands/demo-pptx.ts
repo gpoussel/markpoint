@@ -1,5 +1,3 @@
-import path from 'node:path'
-
 import {
   PowerpointWriter,
   type PowerpointGenerationConfiguration,
@@ -57,6 +55,7 @@ const template: TemplateDefinition = {
   },
 }
 const slides: PowerpointSlidesConfiguration[] = [
+  /*
   {
     layout: 'title',
     parts: [
@@ -165,6 +164,7 @@ calling-birds:
     layout: 'end',
     parts: [],
   },
+  */
 ]
 const presentation: PowerpointPresentationDefinition = {
   slides,
