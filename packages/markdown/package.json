@@ -8,7 +8,8 @@
     "dev": "tsc && tsc -w",
     "clean": "shx rm -rf ./dist",
     "build": "tsc -p tsconfig.build.json",
-    "lint": "prettier -c . && eslint . --cache --max-warnings=0 && tsc --noEmit"
+    "lint": "prettier -c . && eslint . --cache --max-warnings=0 && tsc --noEmit",
+    "lint:fix": "prettier --write ."
   },
   "dependencies": {
     "@types/mdast": "^4.0.3",
