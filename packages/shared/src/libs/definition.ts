@@ -1,6 +1,6 @@
 export interface TemplateDefinition {
   master: {
-    elements: TemplateElementDefunition[]
+    elements: TemplateElementDefinition[]
   }
   layouts: TemplateLayoutDefinition[]
 }
@@ -8,11 +8,21 @@ export interface TemplateDefinition {
 export interface TemplateLayoutDefinition {
   name: string
   baseSlideNumber: number
-  elements: TemplateElementDefunition[]
+  elements: TemplateElementDefinition[]
 }
 
-export interface TemplateElementDefunition {
-  name: string
+export type TemplateElementDefinition = TemplateTextElementDefinition | TemplatePictureElementDefinition
+
+interface BaseTemplateElementDefinition {
   creationId: string
-  type: 'line' | 'picture' | 'text'
+}
+
+export interface TemplateTextElementDefinition extends BaseTemplateElementDefinition {
+  type: 'text'
+  text: string
+}
+
+export interface TemplatePictureElementDefinition extends BaseTemplateElementDefinition {
+  type: 'picture'
+  path: string
 }

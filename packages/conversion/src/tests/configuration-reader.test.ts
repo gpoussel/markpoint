@@ -14,6 +14,10 @@ describe('TemplateConfigurationReader', () => {
       it(`should read the valid/${file} configuration file and return the parsed content`, async ({ expect }) => {
         const result = await templateConfiguration.readConfiguration(join(__dirname, '__fixtures__', 'valid', file))
 
+        // Update result to avoid snapshot mismatches due to different file paths
+        expect(result.baseFile).toMatch(/example\.pptx$/)
+        result.baseFile = '../example.pptx'
+
         expect(result).toMatchSnapshot()
       })
     }

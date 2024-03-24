@@ -1,8 +1,7 @@
-/* eslint-disable unicorn/prefer-dom-node-append */
 import { copyFile, rm } from 'node:fs/promises'
 import path from 'node:path'
 
-import type { TemplateElementConfiguration } from '@markpoint/shared'
+import type { TemplateElementDefinition } from '@markpoint/shared'
 import PPTX, { type Presentation } from 'nodejs-pptx'
 import {
   Automizer,
@@ -16,15 +15,10 @@ import { withDir } from 'tmp-promise'
 
 import type {
   PowerpointGenerationConfiguration,
-  PowerpointListItem,
-  PowerpointPartDefinition,
   PowerpointPicturePartContent,
   PowerpointPresentationDefinition,
   PresentationMetadata,
 } from './generation/configuration.js'
-import { highlightCode } from './generation/highlight.js'
-import { ATTRIBUTE_NAMES, ELEMENT_TAG_NAMES } from './opendocument.js'
-import { removeAllNamedChild } from './utils/xml-utils.js'
 
 const pptx = new PPTX.Composer()
 
@@ -32,34 +26,6 @@ const EMPTY_FILENAME = 'Empty.pptx'
 const TEMPLATE_FILENAME = 'Template.pptx'
 const TEMPLATE_LABEL = 'template'
 const OUTPUT_FILENAME = 'Output.pptx'
-
-const updateTextList = (items: PowerpointListItem[]) => {
-  return (element: XmlElement) => {
-    const textBodies = element.getElementsByTagName(ELEMENT_TAG_NAMES.shapeTextBody)
-    if (textBodies.length === 1) {
-      const textBody = textBodies[0] as Element
-      removeAllNamedChild(textBody, ELEMENT_TAG_NAMES.paragraph)
-      for (const item of items) {
-        const newParagraph = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.paragraph)
-        if (item.level > 0) {
-          const paragraphProperties = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.paragraphProperties)
-          paragraphProperties.setAttribute(ATTRIBUTE_NAMES.level, item.level.toString())
-          newParagraph.appendChild(paragraphProperties)
-        }
-        const newRange = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.range)
-        const newRangeProperties = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.rangeProperties)
-        newRangeProperties.setAttribute(ATTRIBUTE_NAMES.lang, 'en-US')
-        newRangeProperties.setAttribute(ATTRIBUTE_NAMES.dirty, '0')
-        newRange.appendChild(newRangeProperties)
-        const newText = textBody.ownerDocument.createElement(ELEMENT_TAG_NAMES.text)
-        newText.textContent = item.text
-        newRange.appendChild(newText)
-        newParagraph.appendChild(newRange)
-        textBody.appendChild(newParagraph)
-      }
-    }
-  }
-}
 
 export class PowerpointWriter {
   async generate(
@@ -137,12 +103,7 @@ export class PowerpointWriter {
       presentation.loadMedia(name)
     }
     presentation.addMaster(TEMPLATE_LABEL, 1, (master) => {
-      this.fillPartContent(
-        configuration.template.master.elements,
-        configuration.presentation.master,
-        master,
-        imagePaths,
-      )
+      this.fillPartContent(configuration.template.master.elements, master, imagePaths)
     })
     for (const slideConfiguration of configuration.presentation.slides) {
       const layout = configuration.template.layouts.find((layout) => layout.name === slideConfiguration.layout)
@@ -150,88 +111,33 @@ export class PowerpointWriter {
         throw new Error(`Layout '${slideConfiguration.layout}' not found in template`)
       }
       presentation.addSlide(TEMPLATE_LABEL, layout.baseSlideNumber, (slide) => {
-        this.fillPartContent(layout.elements, slideConfiguration.parts, slide, imagePaths)
+        this.fillPartContent(layout.elements, slide, imagePaths)
       })
     }
   }
 
   private fillPartContent(
-    parts: TemplateElementConfiguration[],
-    definitions: PowerpointPartDefinition[],
+    parts: TemplateElementDefinition[],
     object: IMaster | ISlide,
     imagePaths: Record<string, string>,
   ) {
-    const processedElements = new Set<string>()
-    for (const definition of definitions) {
-      if (processedElements.has(definition.name)) {
-        throw new Error(`Part '${definition.name}' is defined multiple times`)
-      }
-
-      const part = parts.find((part) => part.name === definition.name)
-      if (!part) {
-        throw new Error(`Part '${definition.name}' not found in template`)
-      }
-
-      switch (part.type) {
-        case 'line': {
-          if (definition.content.type !== 'line') {
-            throw new Error(`Part '${definition.name}' should be a line`)
-          }
-          object.modifyElement(
-            { name: part.creationId, creationId: part.creationId },
-            ModifyTextHelper.setText(definition.content.text),
-          )
-          break
-        }
-        case 'picture': {
-          if (definition.content.type !== 'picture') {
-            throw new Error(`Part '${definition.name}' should be a picture`)
-          }
-          object.modifyElement(
-            { name: part.creationId, creationId: part.creationId },
-            ModifyImageHelper.setRelationTarget(imagePaths[definition.content.path] as string) as (
-              element: XmlElement | undefined,
-              arg1: XmlElement | undefined,
-            ) => void,
-          )
-          break
-        }
-        case 'text': {
-          if (definition.content.type !== 'list' && definition.content.type !== 'code') {
-            throw new Error(`Part '${definition.name}' should be a list or code`)
-          }
-          if (definition.content.type === 'list') {
-            object.modifyElement(
-              { name: part.creationId, creationId: part.creationId },
-              updateTextList(definition.content.items),
-            )
-          } else {
-            object.modifyElement(
-              { name: part.creationId, creationId: part.creationId },
-              highlightCode(definition.content.language, definition.content.code),
-            )
-          }
-          break
-        }
-        default: {
-          const _never: never = part.type
-          throw new Error(`Part '${part.name}' has an unknown type`, _never)
-        }
-      }
-
-      processedElements.add(definition.name)
-    }
-
     for (const part of parts) {
-      if (processedElements.has(part.name)) {
-        continue
-      }
-      if (part.type === 'picture') {
-        // We currently want to keep the picture from the template even when not set in the presentation
-        continue
+      if (part.type === 'text') {
+        object.modifyElement(
+          { name: part.creationId, creationId: part.creationId },
+          ModifyTextHelper.setText(part.text),
+        )
+      } else {
+        object.modifyElement(
+          { name: part.creationId, creationId: part.creationId },
+          ModifyImageHelper.setRelationTarget(imagePaths[part.path] as string) as (
+            element: XmlElement | undefined,
+            arg1: XmlElement | undefined,
+          ) => void,
+        )
       }
 
-      object.removeElement({ name: part.creationId, creationId: part.creationId })
+      // object.removeElement({ name: part.creationId, creationId: part.creationId })
     }
   }
 }

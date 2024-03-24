@@ -26,26 +26,26 @@ const template: TemplateDefinition = {
       name: 'title',
       baseSlideNumber: 4,
       elements: [
-        { name: 'title', type: 'line', creationId: '{6D871570-FBB8-F282-1B97-65C16AE6C6F4}' },
-        { name: 'subtitle', type: 'line', creationId: '{4F18DD32-924E-CE9C-91B0-4F30CCE1B6F9}' },
+        { type: 'text', creationId: '{6D871570-FBB8-F282-1B97-65C16AE6C6F4}', text: '??' },
+        { type: 'text', creationId: '{4F18DD32-924E-CE9C-91B0-4F30CCE1B6F9}', text: '??' },
       ],
     },
     {
       name: 'sectionTitle',
       baseSlideNumber: 24,
       elements: [
-        { name: 'title', type: 'line', creationId: '{05383CED-A871-D722-5C38-FDB6D14AA784}' },
-        { name: 'subtitle', type: 'line', creationId: '{4F2608E1-5E03-2C7E-434E-5BF07E81F24A}' },
-        { name: 'background', type: 'picture', creationId: '{7B4224E4-95EA-4DE2-B734-333DC4BF7A4F}' },
+        { type: 'text', creationId: '{05383CED-A871-D722-5C38-FDB6D14AA784}', text: '??' },
+        { type: 'text', creationId: '{4F2608E1-5E03-2C7E-434E-5BF07E81F24A}', text: '??' },
+        { type: 'picture', creationId: '{7B4224E4-95EA-4DE2-B734-333DC4BF7A4F}', path: '??' },
       ],
     },
     {
       name: 'contentSlide',
       baseSlideNumber: 21,
       elements: [
-        { name: 'title', type: 'line', creationId: '{4582957B-1559-50B8-87D1-3F29F9DD12B2}' },
-        { name: 'subtitle', type: 'line', creationId: '{28862325-59A6-26E6-FB10-93F6B61575F0}' },
-        { name: 'content', type: 'text', creationId: '{0984FDF1-E23B-9E8F-73B5-6BF495603FA0}' },
+        { type: 'text', creationId: '{4582957B-1559-50B8-87D1-3F29F9DD12B2}', text: '??' },
+        { type: 'text', creationId: '{28862325-59A6-26E6-FB10-93F6B61575F0}', text: '??' },
+        { type: 'text', creationId: '{0984FDF1-E23B-9E8F-73B5-6BF495603FA0}', text: '??' },
       ],
     },
     {
@@ -55,7 +55,7 @@ const template: TemplateDefinition = {
     },
   ],
   master: {
-    elements: [{ name: 'footer', type: 'line', creationId: '{62086BA9-1591-C6CD-E573-A5F8961683B1}' }],
+    elements: [{ type: 'text', creationId: '{62086BA9-1591-C6CD-E573-A5F8961683B1}', text: '??' }],
   },
 }
 const slides: PowerpointSlidesConfiguration[] = [
