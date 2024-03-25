@@ -1,4 +1,4 @@
-import type { MarkdownPresentation } from '@markpoint/markdown'
+import type { MarkdownPresentation, MarkdownSection } from '@markpoint/markdown'
 import { PowerpointWriter, type PowerpointSlidesConfiguration } from '@markpoint/powerpoint'
 import {
   StringUtils,
@@ -7,17 +7,57 @@ import {
   type TemplateElementConfiguration,
   type TemplateElementDefinition,
   type TemplateLayoutConfiguration,
+  type SingleLineText,
 } from '@markpoint/shared'
+
+interface SlideData {
+  metadata?: Record<string, string>
+  section?: MarkdownSection
+}
 
 function convertElementConfigurationToDefinition(
   elementConfiguration: TemplateElementConfiguration,
-  data: Record<string, string>,
+  data: SlideData,
 ): TemplateElementDefinition {
   if (elementConfiguration.type === 'text') {
+    if (!data.metadata) {
+      throw new Error('Cannot convert text element without metadata')
+    }
     return {
       creationId: elementConfiguration.creationId,
       type: 'text',
-      text: StringUtils.template(elementConfiguration.template, data),
+      text: [
+        {
+          text: StringUtils.template(elementConfiguration.template, data.metadata),
+          bold: false,
+          italic: false,
+          monospace: false,
+        },
+      ],
+    }
+  }
+  if (elementConfiguration.type === 'content') {
+    if (!data.section) {
+      throw new Error('Cannot convert content element without section')
+    }
+    let textLine: SingleLineText
+    switch (elementConfiguration.reference) {
+      case 'title': {
+        textLine = data.section.title
+        break
+      }
+      case 'summary': {
+        textLine = data.section.summary ?? []
+        break
+      }
+      default: {
+        throw new Error(`Unsupported content reference`)
+      }
+    }
+    return {
+      creationId: elementConfiguration.creationId,
+      type: 'text',
+      text: textLine,
     }
   }
   throw new Error(`Unsupported element type: ${elementConfiguration.type}`)
@@ -25,7 +65,7 @@ function convertElementConfigurationToDefinition(
 
 function generateSlide(
   layoutConfiguration: TemplateLayoutConfiguration,
-  data: Record<string, string>,
+  data: SlideData,
 ): PowerpointSlidesConfiguration {
   return {
     layoutSlide: layoutConfiguration.baseSlideNumber,
@@ -41,7 +81,7 @@ export class MarkpointConverter {
   ): Promise<void> {
     const powerpointWriter = new PowerpointWriter()
 
-    const templateData = {
+    const documentTemplateData = {
       title: presentation.title,
       company: presentation.metadata?.company ?? '',
       author: presentation.metadata?.author ?? '',
@@ -54,20 +94,32 @@ export class MarkpointConverter {
       layouts: [],
       master: {
         elements: templateConfiguration.master.elements.map((e) =>
-          convertElementConfigurationToDefinition(e, templateData),
+          convertElementConfigurationToDefinition(e, { metadata: documentTemplateData }),
         ),
       },
     }
     const slides: PowerpointSlidesConfiguration[] = []
     const layout = templateConfiguration.layout
-    const firstSlideLayout = layout?.document?.first
-    if (firstSlideLayout) {
-      slides.push(generateSlide(firstSlideLayout, templateData))
+    const firstDocumentSlideLayout = layout?.document?.first
+    if (firstDocumentSlideLayout) {
+      slides.push(generateSlide(firstDocumentSlideLayout, { metadata: documentTemplateData }))
     }
 
-    const lastSlideLayout = layout?.document?.last
-    if (lastSlideLayout) {
-      slides.push(generateSlide(lastSlideLayout, templateData))
+    for (const section of presentation.sections) {
+      const firstSectionSlideLayout = layout?.section?.first
+      if (firstSectionSlideLayout) {
+        slides.push(generateSlide(firstSectionSlideLayout, { section }))
+      }
+
+      const lastSectionSlideLayout = layout?.section?.last
+      if (lastSectionSlideLayout) {
+        slides.push(generateSlide(lastSectionSlideLayout, { section }))
+      }
+    }
+
+    const lastDocumentSlideLayout = layout?.document?.last
+    if (lastDocumentSlideLayout) {
+      slides.push(generateSlide(lastDocumentSlideLayout, { metadata: documentTemplateData }))
     }
 
     await powerpointWriter.generate(
@@ -86,7 +138,5 @@ export class MarkpointConverter {
       },
       outputFile,
     )
-    // eslint-disable-next-line no-console
-    console.log({ presentation })
   }
 }

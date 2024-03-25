@@ -4,6 +4,7 @@ import { common, createLowlight } from 'lowlight'
 import type { ShapeModificationCallback, XmlElement } from 'pptx-automizer'
 
 import { ELEMENT_TAG_NAMES } from '../opendocument.js'
+import { createParagraph, createTextNode } from '../utils/pptx-utils.js'
 import {
   getElementByTagNameRecursive,
   getOrCreateChild,
@@ -14,11 +15,6 @@ import {
 import type { PowerpointCodeLanguage } from './configuration.js'
 
 const lowlight = createLowlight(common)
-
-function createParagraph(document: Document) {
-  const paragraph = document.createElement(ELEMENT_TAG_NAMES.paragraph)
-  return paragraph
-}
 
 function getOrCreateSolidFill(element: Element, rgbColor: string) {
   const solidFill = getOrCreateChild(element, ELEMENT_TAG_NAMES.solidFill)
@@ -98,12 +94,7 @@ function createRange(document: Document, text: string, kind: ElementKind) {
   rangeProperties.appendChild(latin)
 
   range.appendChild(rangeProperties)
-
-  const textElement = document.createElement(ELEMENT_TAG_NAMES.text)
-  textElement.setAttribute('xml:space', 'preserve')
-  textElement.appendChild(document.createTextNode(text))
-  range.appendChild(textElement)
-
+  range.appendChild(createTextNode(document, text))
   return range
 }
 

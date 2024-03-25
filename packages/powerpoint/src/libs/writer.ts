@@ -3,14 +3,7 @@ import path from 'node:path'
 
 import type { TemplateElementDefinition } from '@markpoint/shared'
 import PPTX, { type Presentation } from 'nodejs-pptx'
-import {
-  Automizer,
-  ModifyImageHelper,
-  ModifyTextHelper,
-  type IMaster,
-  type XmlElement,
-  type ISlide,
-} from 'pptx-automizer'
+import { Automizer, ModifyImageHelper, type IMaster, type XmlElement, type ISlide } from 'pptx-automizer'
 import { withDir } from 'tmp-promise'
 
 import type {
@@ -18,6 +11,7 @@ import type {
   PowerpointPresentationDefinition,
   PresentationMetadata,
 } from './generation/configuration.js'
+import { setSingleLineText } from './generation/text.js'
 
 const pptx = new PPTX.Composer()
 
@@ -121,10 +115,7 @@ export class PowerpointWriter {
   ) {
     for (const part of parts) {
       if (part.type === 'text') {
-        object.modifyElement(
-          { name: part.creationId, creationId: part.creationId },
-          ModifyTextHelper.setText(part.text),
-        )
+        object.modifyElement({ name: part.creationId, creationId: part.creationId }, setSingleLineText(part.text))
       } else {
         object.modifyElement(
           { name: part.creationId, creationId: part.creationId },

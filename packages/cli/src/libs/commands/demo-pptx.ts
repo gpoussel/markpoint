@@ -22,16 +22,32 @@ const template: TemplateDefinition = {
       name: 'title',
       baseSlideNumber: 4,
       elements: [
-        { type: 'text', creationId: '{6D871570-FBB8-F282-1B97-65C16AE6C6F4}', text: '??' },
-        { type: 'text', creationId: '{4F18DD32-924E-CE9C-91B0-4F30CCE1B6F9}', text: '??' },
+        {
+          type: 'text',
+          creationId: '{6D871570-FBB8-F282-1B97-65C16AE6C6F4}',
+          text: [{ text: '??', bold: false, italic: false, monospace: false }],
+        },
+        {
+          type: 'text',
+          creationId: '{4F18DD32-924E-CE9C-91B0-4F30CCE1B6F9}',
+          text: [{ text: '??', bold: false, italic: false, monospace: false }],
+        },
       ],
     },
     {
       name: 'sectionTitle',
       baseSlideNumber: 24,
       elements: [
-        { type: 'text', creationId: '{05383CED-A871-D722-5C38-FDB6D14AA784}', text: '??' },
-        { type: 'text', creationId: '{4F2608E1-5E03-2C7E-434E-5BF07E81F24A}', text: '??' },
+        {
+          type: 'text',
+          creationId: '{05383CED-A871-D722-5C38-FDB6D14AA784}',
+          text: [{ text: '??', bold: false, italic: false, monospace: false }],
+        },
+        {
+          type: 'text',
+          creationId: '{4F2608E1-5E03-2C7E-434E-5BF07E81F24A}',
+          text: [{ text: '??', bold: false, italic: false, monospace: false }],
+        },
         { type: 'picture', creationId: '{7B4224E4-95EA-4DE2-B734-333DC4BF7A4F}', path: '??' },
       ],
     },
@@ -39,9 +55,21 @@ const template: TemplateDefinition = {
       name: 'contentSlide',
       baseSlideNumber: 21,
       elements: [
-        { type: 'text', creationId: '{4582957B-1559-50B8-87D1-3F29F9DD12B2}', text: '??' },
-        { type: 'text', creationId: '{28862325-59A6-26E6-FB10-93F6B61575F0}', text: '??' },
-        { type: 'text', creationId: '{0984FDF1-E23B-9E8F-73B5-6BF495603FA0}', text: '??' },
+        {
+          type: 'text',
+          creationId: '{4582957B-1559-50B8-87D1-3F29F9DD12B2}',
+          text: [{ text: '??', bold: false, italic: false, monospace: false }],
+        },
+        {
+          type: 'text',
+          creationId: '{28862325-59A6-26E6-FB10-93F6B61575F0}',
+          text: [{ text: '??', bold: false, italic: false, monospace: false }],
+        },
+        {
+          type: 'text',
+          creationId: '{0984FDF1-E23B-9E8F-73B5-6BF495603FA0}',
+          text: [{ text: '??', bold: false, italic: false, monospace: false }],
+        },
       ],
     },
     {
@@ -51,7 +79,13 @@ const template: TemplateDefinition = {
     },
   ],
   master: {
-    elements: [{ type: 'text', creationId: '{62086BA9-1591-C6CD-E573-A5F8961683B1}', text: '??' }],
+    elements: [
+      {
+        type: 'text',
+        creationId: '{62086BA9-1591-C6CD-E573-A5F8961683B1}',
+        text: [{ text: '??', bold: false, italic: false, monospace: false }],
+      },
+    ],
   },
 }
 const slides: PowerpointSlidesConfiguration[] = [

@@ -1,3 +1,4 @@
+import type { SingleLineText } from '@markpoint/shared'
 import z from 'zod'
 
 export interface MarkdownPresentation {
@@ -18,13 +19,6 @@ export interface MarkdownSlide {
   content: MarkdownMixedContent[]
 }
 
-export interface TextPart {
-  text: string
-  bold: boolean
-  italic: boolean
-  monospace: boolean
-}
-
 export type MarkdownCodeLanguage = 'yaml' | 'json' | 'text'
 
 export interface MarkdownCodeContent {
@@ -42,8 +36,6 @@ export interface MarkdownTextContent {
 }
 
 export type MarkdownMixedContent = MarkdownCodeContent | MarkdownTextContent
-
-export type SingleLineText = TextPart[]
 
 export const FrontmatterObjectType = z.object({
   company: z.string().optional(),

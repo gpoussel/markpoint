@@ -10,6 +10,14 @@ const TemplateElementConfigurationSchema = z.discriminatedUnion('type', [
   BaseTemplateElementConfigurationSchema.merge(
     z
       .object({
+        type: z.literal('content'),
+        reference: z.enum(['title', 'summary']),
+      })
+      .strict(),
+  ),
+  BaseTemplateElementConfigurationSchema.merge(
+    z
+      .object({
         type: z.literal('text'),
         template: z.string(),
       })
@@ -33,6 +41,14 @@ export const TemplateLayoutConfigurationSchema = z
   })
   .strict()
 
+const FirstAndLastTemplateLayoutConfigurationSchema = z
+  .object({
+    first: TemplateLayoutConfigurationSchema.optional(),
+    last: TemplateLayoutConfigurationSchema.optional(),
+  })
+  .strict()
+  .optional()
+
 export const TemplateConfigurationSchema = z
   .object({
     baseFile: z.string(),
@@ -43,13 +59,8 @@ export const TemplateConfigurationSchema = z
       .strict(),
     layout: z
       .object({
-        document: z
-          .object({
-            first: TemplateLayoutConfigurationSchema.optional(),
-            last: TemplateLayoutConfigurationSchema.optional(),
-          })
-          .strict()
-          .optional(),
+        document: FirstAndLastTemplateLayoutConfigurationSchema,
+        section: FirstAndLastTemplateLayoutConfigurationSchema,
       })
       .strict()
       .optional(),

@@ -1,3 +1,5 @@
+import type { SingleLineText } from './text.js'
+
 export interface TemplateDefinition {
   master: {
     elements: TemplateElementDefinition[]
@@ -19,7 +21,7 @@ interface BaseTemplateElementDefinition {
 
 export interface TemplateTextElementDefinition extends BaseTemplateElementDefinition {
   type: 'text'
-  text: string
+  text: SingleLineText
 }
 
 export interface TemplatePictureElementDefinition extends BaseTemplateElementDefinition {

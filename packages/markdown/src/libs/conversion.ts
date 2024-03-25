@@ -1,3 +1,4 @@
+import type { SingleLineText } from '@markpoint/shared'
 import type { Root, PhrasingContent, Paragraph, RootContent, List, ThematicBreak, Heading } from 'mdast'
 
 import type {
@@ -7,7 +8,6 @@ import type {
   MarkdownSection,
   MarkdownSlide,
   MarkdownTextContent,
-  SingleLineText,
 } from './types.js'
 import { splitParts } from './utils.js'
 
