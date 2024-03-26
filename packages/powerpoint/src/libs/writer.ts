@@ -12,6 +12,7 @@ import type {
   PresentationMetadata,
 } from './generation/configuration.js'
 import { setSingleLineText, setTextBlock } from './generation/text.js'
+import type { PresentationTheme } from './theme.js'
 
 const pptx = new PPTX.Composer()
 
@@ -21,6 +22,11 @@ const TEMPLATE_LABEL = 'template'
 const OUTPUT_FILENAME = 'Output.pptx'
 
 export class PowerpointWriter {
+  #theme: PresentationTheme
+  public constructor(theme: PresentationTheme) {
+    this.#theme = theme
+  }
+
   async generate(
     templatePath: string,
     configuration: PowerpointGenerationConfiguration,
@@ -115,9 +121,15 @@ export class PowerpointWriter {
   ) {
     for (const part of parts) {
       if (part.type === 'text') {
-        object.modifyElement({ name: part.creationId, creationId: part.creationId }, setSingleLineText(part.text))
+        object.modifyElement(
+          { name: part.creationId, creationId: part.creationId },
+          setSingleLineText(this.#theme, part.text),
+        )
       } else if (part.type === 'textBlock') {
-        object.modifyElement({ name: part.creationId, creationId: part.creationId }, setTextBlock(part.lines))
+        object.modifyElement(
+          { name: part.creationId, creationId: part.creationId },
+          setTextBlock(this.#theme, part.lines),
+        )
       } else {
         object.modifyElement(
           { name: part.creationId, creationId: part.creationId },

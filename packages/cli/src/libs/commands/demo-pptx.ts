@@ -4,6 +4,7 @@ import {
   type PowerpointSlidesConfiguration,
   type PresentationMetadata,
   type PowerpointPresentationDefinition,
+  PresentationTheme,
 } from '@markpoint/powerpoint'
 import type { TemplateDefinition } from '@markpoint/shared'
 
@@ -210,6 +211,10 @@ const configuration: PowerpointGenerationConfiguration = {
 }
 
 export async function samplePowerpointGeneration(templatePath: string, outputPath: string) {
-  const writer = new PowerpointWriter()
+  const writer = new PowerpointWriter(
+    new PresentationTheme({
+      monospace: 'Courier New',
+    }),
+  )
   await writer.generate(templatePath, configuration, outputPath)
 }

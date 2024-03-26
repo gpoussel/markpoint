@@ -5,7 +5,7 @@ import type {
   MarkdownSlide,
   MarkdownTextContent,
 } from '@markpoint/markdown'
-import { PowerpointWriter, type PowerpointSlidesConfiguration } from '@markpoint/powerpoint'
+import { PowerpointWriter, type PowerpointSlidesConfiguration, PresentationTheme } from '@markpoint/powerpoint'
 import {
   StringUtils,
   type TemplateConfiguration,
@@ -105,7 +105,8 @@ export class MarkpointConverter {
     presentation: MarkdownPresentation,
     outputFile: string,
   ): Promise<void> {
-    const powerpointWriter = new PowerpointWriter()
+    const theme = new PresentationTheme(templateConfiguration.theme.font)
+    const powerpointWriter = new PowerpointWriter(theme)
 
     const documentTemplateData = {
       title: presentation.title,

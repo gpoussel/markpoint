@@ -56,6 +56,13 @@ export const TemplateConfigurationSchema = z
         elements: z.array(TemplateElementConfigurationSchema),
       })
       .strict(),
+    theme: z
+      .object({
+        font: z.object({
+          monospace: z.string(),
+        }),
+      })
+      .strict(),
     layout: z
       .object({
         document: FirstAndLastTemplateLayoutConfigurationSchema,

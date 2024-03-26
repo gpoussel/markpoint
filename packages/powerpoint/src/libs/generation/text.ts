@@ -3,10 +3,16 @@ import type { SingleLineText, TemplateTextBlockElementDefinition, TextPart } fro
 import type { ShapeModificationCallback, XmlElement } from 'pptx-automizer'
 
 import { ELEMENT_TAG_NAMES } from '../opendocument.js'
+import type { PresentationTheme } from '../theme.js'
 import { createParagraph, createParagraphProperties, createTextNode } from '../utils/pptx-utils.js'
 import { getElementByTagNameRecursive, getOrCreateChild, removeAllNamedChild } from '../utils/xml-utils.js'
 
-function createRange(document: Document, textPart: TextPart, existingRangeProperties: Element | undefined): Node {
+function createRange(
+  theme: PresentationTheme,
+  document: Document,
+  textPart: TextPart,
+  existingRangeProperties: Element | undefined,
+): Node {
   const range = document.createElement(ELEMENT_TAG_NAMES.range)
   const rangeProperties = existingRangeProperties
     ? (existingRangeProperties.cloneNode(true) as Element)
@@ -17,7 +23,7 @@ function createRange(document: Document, textPart: TextPart, existingRangeProper
   rangeProperties.setAttribute('dirty', '1')
   if (textPart.monospace) {
     const latin = getOrCreateChild(rangeProperties, ELEMENT_TAG_NAMES.latin)
-    latin.setAttribute('typeface', `VictorMono Nerd Font`)
+    latin.setAttribute('typeface', theme.font.monospace)
     latin.setAttribute('panose', '00000309000000000000')
     latin.setAttribute('pitchFamily', '50')
     latin.setAttribute('charset', '0')
@@ -37,7 +43,7 @@ function cleanupContent(element: XmlElement): { rangeProperties: Element | undef
   return { rangeProperties: existingRangeProperties, textBody }
 }
 
-export function setSingleLineText(singleLineText: SingleLineText): ShapeModificationCallback {
+export function setSingleLineText(theme: PresentationTheme, singleLineText: SingleLineText): ShapeModificationCallback {
   return (element: XmlElement) => {
     const { rangeProperties, textBody } = cleanupContent(element)
     if (!textBody) {
@@ -45,13 +51,16 @@ export function setSingleLineText(singleLineText: SingleLineText): ShapeModifica
     }
     const paragraphElement = createParagraph(element.ownerDocument)
     for (const textPart of singleLineText) {
-      paragraphElement.appendChild(createRange(element.ownerDocument, textPart, rangeProperties))
+      paragraphElement.appendChild(createRange(theme, element.ownerDocument, textPart, rangeProperties))
     }
     textBody.appendChild(paragraphElement)
   }
 }
 
-export function setTextBlock(textLines: TemplateTextBlockElementDefinition['lines']): ShapeModificationCallback {
+export function setTextBlock(
+  theme: PresentationTheme,
+  textLines: TemplateTextBlockElementDefinition['lines'],
+): ShapeModificationCallback {
   return (element: XmlElement) => {
     const { rangeProperties, textBody } = cleanupContent(element)
     if (!textBody) {
@@ -67,7 +76,7 @@ export function setTextBlock(textLines: TemplateTextBlockElementDefinition['line
       const paragraphElement = createParagraph(element.ownerDocument)
       paragraphElement.appendChild(createParagraphProperties(element.ownerDocument, line.level))
       for (const textPart of line.text) {
-        paragraphElement.appendChild(createRange(element.ownerDocument, textPart, rangeProperties))
+        paragraphElement.appendChild(createRange(theme, element.ownerDocument, textPart, rangeProperties))
       }
       textBody.appendChild(paragraphElement)
     }
