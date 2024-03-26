@@ -1,4 +1,4 @@
-import type { MarkdownPresentation, MarkdownSection } from '@markpoint/markdown'
+import type { MarkdownPresentation, MarkdownSection, MarkdownSlide } from '@markpoint/markdown'
 import { PowerpointWriter, type PowerpointSlidesConfiguration } from '@markpoint/powerpoint'
 import {
   StringUtils,
@@ -13,6 +13,7 @@ import {
 interface SlideData {
   metadata?: Record<string, string>
   section?: MarkdownSection
+  part?: MarkdownSlide
 }
 
 function convertElementConfigurationToDefinition(
@@ -37,27 +38,50 @@ function convertElementConfigurationToDefinition(
     }
   }
   if (elementConfiguration.type === 'content') {
-    if (!data.section) {
-      throw new Error('Cannot convert content element without section')
-    }
-    let textLine: SingleLineText
-    switch (elementConfiguration.reference) {
-      case 'title': {
-        textLine = data.section.title
-        break
+    if (data.section && !data.part) {
+      let textLine: SingleLineText
+      switch (elementConfiguration.reference) {
+        case 'title': {
+          textLine = data.section.title
+          break
+        }
+        case 'summary': {
+          textLine = data.section.summary ?? []
+          break
+        }
+        default: {
+          throw new Error(`Unsupported content reference`)
+        }
       }
-      case 'summary': {
-        textLine = data.section.summary ?? []
-        break
+      return {
+        creationId: elementConfiguration.creationId,
+        type: 'text',
+        text: textLine,
       }
-      default: {
-        throw new Error(`Unsupported content reference`)
+    } else if (data.section && data.part) {
+      let textLine: SingleLineText
+      switch (elementConfiguration.reference) {
+        case 'title': {
+          textLine = data.section.title
+          break
+        }
+        case 'subtitle': {
+          textLine = data.part.title ?? []
+          break
+        }
+        case 'content': {
+          textLine = [] // TODO: Implement content extraction
+          break
+        }
+        default: {
+          throw new Error(`Unsupported content reference`)
+        }
       }
-    }
-    return {
-      creationId: elementConfiguration.creationId,
-      type: 'text',
-      text: textLine,
+      return {
+        creationId: elementConfiguration.creationId,
+        type: 'text',
+        text: textLine,
+      }
     }
   }
   throw new Error(`Unsupported element type: ${elementConfiguration.type}`)
@@ -100,24 +124,46 @@ export class MarkpointConverter {
     }
     const slides: PowerpointSlidesConfiguration[] = []
     const layout = templateConfiguration.layout
-    const firstDocumentSlideLayout = layout?.document?.first
+    const firstDocumentSlideLayout = layout.document?.first
     if (firstDocumentSlideLayout) {
       slides.push(generateSlide(firstDocumentSlideLayout, { metadata: documentTemplateData }))
     }
 
     for (const section of presentation.sections) {
-      const firstSectionSlideLayout = layout?.section?.first
+      const firstSectionSlideLayout = layout.section?.first
       if (firstSectionSlideLayout) {
         slides.push(generateSlide(firstSectionSlideLayout, { section }))
       }
 
-      const lastSectionSlideLayout = layout?.section?.last
+      for (const sectionSlide of section.slides) {
+        // const title = sectionSlide.title
+        const content = sectionSlide.content
+
+        const uniqueContentTypes = [...new Set(content.map((c) => c.type))].sort()
+        if (uniqueContentTypes.length === 1 && uniqueContentTypes[0] === 'text') {
+          // Section with full text content
+          const layout = templateConfiguration.layout.content.text
+          if (!layout) {
+            throw new Error('No layout for text content')
+          }
+          slides.push({
+            layoutSlide: layout.baseSlideNumber,
+            content: layout.elements.map((e) =>
+              convertElementConfigurationToDefinition(e, { part: sectionSlide, section }),
+            ),
+          })
+        } else {
+          console.error('Unsupported content types:', uniqueContentTypes)
+        }
+      }
+
+      const lastSectionSlideLayout = layout.section?.last
       if (lastSectionSlideLayout) {
         slides.push(generateSlide(lastSectionSlideLayout, { section }))
       }
     }
 
-    const lastDocumentSlideLayout = layout?.document?.last
+    const lastDocumentSlideLayout = layout.document?.last
     if (lastDocumentSlideLayout) {
       slides.push(generateSlide(lastDocumentSlideLayout, { metadata: documentTemplateData }))
     }

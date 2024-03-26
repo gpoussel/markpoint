@@ -14,6 +14,8 @@ export interface MarkdownSection {
   slides: MarkdownSlide[]
 }
 
+// TODO: Name "slide" is misleading, as it is actually a "slide content"
+// Maybe rename to MarkdownSlideContent? or MarkdownPage? or MarkdownPart?
 export interface MarkdownSlide {
   title: SingleLineText | undefined
   content: MarkdownMixedContent[]

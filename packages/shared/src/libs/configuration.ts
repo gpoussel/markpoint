@@ -11,7 +11,7 @@ const TemplateElementConfigurationSchema = z.discriminatedUnion('type', [
     z
       .object({
         type: z.literal('content'),
-        reference: z.enum(['title', 'summary']),
+        reference: z.enum(['title', 'subtitle', 'summary', 'content']),
       })
       .strict(),
   ),
@@ -35,7 +35,6 @@ const TemplateElementConfigurationSchema = z.discriminatedUnion('type', [
 
 export const TemplateLayoutConfigurationSchema = z
   .object({
-    name: z.string().optional(), // TODO: remove once "layouts" is entirely replaced by "layout"
     baseSlideNumber: z.number(),
     elements: z.array(TemplateElementConfigurationSchema),
   })
@@ -61,10 +60,13 @@ export const TemplateConfigurationSchema = z
       .object({
         document: FirstAndLastTemplateLayoutConfigurationSchema,
         section: FirstAndLastTemplateLayoutConfigurationSchema,
+        content: z
+          .object({
+            text: TemplateLayoutConfigurationSchema.optional(),
+          })
+          .strict(),
       })
-      .strict()
-      .optional(),
-    layouts: z.array(TemplateLayoutConfigurationSchema),
+      .strict(),
   })
   .strict()
 
