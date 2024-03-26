@@ -11,7 +11,7 @@ import {
   XML_FILE_NAMES,
   ATTRIBUTE_NAMES,
   SLIDE_ELEMENT_TYPES,
-  EMU_PER_CENTIMETER,
+  emuToCentimeters,
 } from './opendocument.js'
 import type {
   PowerpointSlideTextElement,
@@ -119,19 +119,19 @@ export class PowerpointReader {
 
   getPosition(element: ElementInfo): PowerpointLocation {
     return {
-      x: element.position.x / EMU_PER_CENTIMETER,
-      y: element.position.y / EMU_PER_CENTIMETER,
-      width: element.position.cx / EMU_PER_CENTIMETER,
-      height: element.position.cy / EMU_PER_CENTIMETER,
+      x: emuToCentimeters(element.position.x),
+      y: emuToCentimeters(element.position.y),
+      width: emuToCentimeters(element.position.cx),
+      height: emuToCentimeters(element.position.cy),
     }
   }
 
   getPositionFromOffsetExtent(offset: Element | undefined, extent: Element | undefined): PowerpointLocation {
     return {
-      x: Number.parseInt(offset?.getAttribute(ATTRIBUTE_NAMES.x) ?? '0') / EMU_PER_CENTIMETER,
-      y: Number.parseInt(offset?.getAttribute(ATTRIBUTE_NAMES.y) ?? '0') / EMU_PER_CENTIMETER,
-      width: Number.parseInt(extent?.getAttribute(ATTRIBUTE_NAMES.cx) ?? '0') / EMU_PER_CENTIMETER,
-      height: Number.parseInt(extent?.getAttribute(ATTRIBUTE_NAMES.cy) ?? '0') / EMU_PER_CENTIMETER,
+      x: emuToCentimeters(offset?.getAttribute(ATTRIBUTE_NAMES.x)),
+      y: emuToCentimeters(offset?.getAttribute(ATTRIBUTE_NAMES.y)),
+      width: emuToCentimeters(extent?.getAttribute(ATTRIBUTE_NAMES.cx)),
+      height: emuToCentimeters(extent?.getAttribute(ATTRIBUTE_NAMES.cy)),
     }
   }
 

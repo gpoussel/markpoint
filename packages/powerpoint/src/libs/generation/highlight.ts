@@ -1,9 +1,11 @@
 /* eslint-disable unicorn/prefer-dom-node-append */
+import type { CodeLanguage } from '@markpoint/shared'
 import type { Comment as CommentHast, Doctype as DoctypeHast, Element as ElementHast, Text as TextHast } from 'hast'
 import { common, createLowlight } from 'lowlight'
 import type { ShapeModificationCallback, XmlElement } from 'pptx-automizer'
 
-import { ELEMENT_TAG_NAMES } from '../opendocument.js'
+import { ATTRIBUTE_NAMES, ELEMENT_TAG_NAMES, centimetersToEmu, emuToPoints } from '../opendocument.js'
+import type { PresentationTheme } from '../theme.js'
 import { createParagraph, createTextNode } from '../utils/pptx-utils.js'
 import {
   getElementByTagNameRecursive,
@@ -12,7 +14,7 @@ import {
   removeAllNamedChild,
 } from '../utils/xml-utils.js'
 
-import type { PowerpointCodeLanguage } from './configuration.js'
+import { computeTextFitOptions } from './sizing.js'
 
 const lowlight = createLowlight(common)
 
@@ -36,58 +38,20 @@ type ElementKind =
   | 'whitespace'
   | 'meta'
 
-function createRange(document: Document, text: string, kind: ElementKind) {
+function createRange(theme: PresentationTheme, document: Document, text: string, kind: ElementKind) {
   const range = document.createElement(ELEMENT_TAG_NAMES.range)
 
   const rangeProperties = document.createElement(ELEMENT_TAG_NAMES.rangeProperties)
   rangeProperties.setAttribute('lang', 'en-US')
   rangeProperties.setAttribute('sz', '1400')
-  rangeProperties.setAttribute('b', '0')
   rangeProperties.setAttribute('dirty', '0')
-
-  let color
-  switch (kind) {
-    case 'comment': {
-      color = '676867'
-      break
-    }
-    case 'attr': {
-      color = '9A9B99'
-      break
-    }
-    case 'keyword':
-    case 'number': {
-      color = '6089B4'
-      break
-    }
-    case 'punctuation':
-    case 'bullet':
-    case 'meta': {
-      color = 'C5C8C6'
-      break
-    }
-    case 'string': {
-      color = '9AA83A'
-      break
-    }
-    case 'literal': {
-      color = '56B6C2'
-      break
-    }
-    case 'whitespace': {
-      color = undefined
-      break
-    }
-    default: {
-      throw new Error('Unsupported kind')
-    }
-  }
+  const color = theme.color[`code.${kind}`] ?? theme.color[`code.default`]
   if (color) {
     getOrCreateSolidFill(rangeProperties, color)
   }
 
   const latin = document.createElement(ELEMENT_TAG_NAMES.latin)
-  latin.setAttribute('typeface', `VictorMono Nerd Font`)
+  latin.setAttribute('typeface', theme.font.monospace)
   latin.setAttribute('panose', '00000309000000000000')
   latin.setAttribute('pitchFamily', '50')
   latin.setAttribute('charset', '0')
@@ -122,6 +86,7 @@ function detectKind(element: ElementHast): ElementKind {
 }
 
 function convertElementToRanges(
+  theme: PresentationTheme,
   xmlElement: Element,
   element: CommentHast | DoctypeHast | ElementHast | TextHast,
   kind?: ElementKind,
@@ -132,19 +97,29 @@ function convertElementToRanges(
   if (element.type === 'element') {
     const kind = detectKind(element)
     const children = element.children
-    return children.flatMap((c) => convertElementToRanges(xmlElement, c, kind))
+    return children.flatMap((c) => convertElementToRanges(theme, xmlElement, c, kind))
   }
   const childKind = kind ?? (element.type === 'text' ? 'whitespace' : 'comment')
-  return [createRange(xmlElement.ownerDocument, element.value, childKind)]
+  return [createRange(theme, xmlElement.ownerDocument, element.value, childKind)]
 }
 
-export function highlightCode(language: PowerpointCodeLanguage, code: string): ShapeModificationCallback {
+function countCodeLines(code: string) {
+  return code.split('\n').length
+}
+
+export function highlightCode(
+  theme: PresentationTheme,
+  language: CodeLanguage,
+  code: string,
+): ShapeModificationCallback {
   return (element: XmlElement) => {
     const shapeProperties = getElementByTagNameRecursive(element, ELEMENT_TAG_NAMES.shapeProperties)
     if (!shapeProperties) {
       return
     }
-    getOrCreateSolidFill(shapeProperties, '1E1E1E')
+    if (theme.color['code.background']) {
+      getOrCreateSolidFill(shapeProperties, theme.color['code.background'])
+    }
 
     const textBody = getElementByTagNameRecursive(element, ELEMENT_TAG_NAMES.shapeTextBody)
     if (!textBody) {
@@ -153,13 +128,39 @@ export function highlightCode(language: PowerpointCodeLanguage, code: string): S
     removeAllNamedChild(textBody, ELEMENT_TAG_NAMES.paragraph)
 
     const bodyProperties = getOrCreateChild(element, ELEMENT_TAG_NAMES.bodyProperties)
+    const insetHeightEmu = centimetersToEmu(0.25)
     for (const dir of ['lIns', 'tIns', 'rIns', 'bIns']) {
-      bodyProperties.setAttribute(dir, '46800')
+      bodyProperties.setAttribute(dir, insetHeightEmu.toString())
     }
     bodyProperties.setAttribute('anchor', 't')
     bodyProperties.setAttribute('anchorCtr', '0')
     removeAllChild(bodyProperties)
-    getOrCreateChild(bodyProperties, ELEMENT_TAG_NAMES.normalizedAutoFit)
+    const codeLines = countCodeLines(code)
+
+    const paragraphMarginPoints = 2
+    const extentTag = getElementByTagNameRecursive(
+      shapeProperties,
+      ELEMENT_TAG_NAMES.transform,
+      ELEMENT_TAG_NAMES.extent,
+    )
+    if (extentTag) {
+      const shapeHeightEmu = Number.parseInt(extentTag.getAttribute('cy') as string)
+      const availableTextHeightPoints = emuToPoints(shapeHeightEmu - 2 * insetHeightEmu)
+      const textFitOptions = computeTextFitOptions(
+        codeLines,
+        14 /* TODO: Auto detect */,
+        availableTextHeightPoints,
+        paragraphMarginPoints,
+      )
+      const normAutoFit = element.ownerDocument.createElement(ELEMENT_TAG_NAMES.normalizedAutoFit)
+      if (textFitOptions.fontScale) {
+        normAutoFit.setAttribute('fontScale', (textFitOptions.fontScale * 1000).toString())
+      }
+      if (textFitOptions.lineSpaceReduction) {
+        normAutoFit.setAttribute('lnSpcReduction', (textFitOptions.lineSpaceReduction * 1000).toString())
+      }
+      bodyProperties.appendChild(normAutoFit)
+    }
 
     const root = lowlight.highlight(language, code)
 
@@ -189,7 +190,16 @@ export function highlightCode(language: PowerpointCodeLanguage, code: string): S
 
     for (const paragraph of paragraphs) {
       const paragraphElement = createParagraph(element.ownerDocument)
-      for (const r of paragraph.flatMap((c) => convertElementToRanges(element, c))) {
+      const paragraphProperties = element.ownerDocument.createElement(ELEMENT_TAG_NAMES.paragraphProperties)
+      for (const dir of [ELEMENT_TAG_NAMES.spacingBefore, ELEMENT_TAG_NAMES.spacingAfter]) {
+        const spacing = element.ownerDocument.createElement(dir)
+        const spacingValue = element.ownerDocument.createElement(ELEMENT_TAG_NAMES.spacingPoints)
+        spacingValue.setAttribute(ATTRIBUTE_NAMES.val, (paragraphMarginPoints * 100).toString())
+        spacing.appendChild(spacingValue)
+        paragraphProperties.appendChild(spacing)
+      }
+      paragraphElement.appendChild(paragraphProperties)
+      for (const r of paragraph.flatMap((c) => convertElementToRanges(theme, element, c))) {
         paragraphElement.appendChild(r)
       }
       textBody.appendChild(paragraphElement)

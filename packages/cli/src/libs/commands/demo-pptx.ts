@@ -212,9 +212,15 @@ const configuration: PowerpointGenerationConfiguration = {
 
 export async function samplePowerpointGeneration(templatePath: string, outputPath: string) {
   const writer = new PowerpointWriter(
-    new PresentationTheme({
-      monospace: 'Courier New',
-    }),
+    new PresentationTheme(
+      {
+        monospace: 'Courier New',
+      },
+      {},
+      {
+        codeLines: 10,
+      },
+    ),
   )
   await writer.generate(templatePath, configuration, outputPath)
 }

@@ -11,6 +11,7 @@ import type {
   PowerpointPresentationDefinition,
   PresentationMetadata,
 } from './generation/configuration.js'
+import { highlightCode } from './generation/highlight.js'
 import { setSingleLineText, setTextBlock } from './generation/text.js'
 import type { PresentationTheme } from './theme.js'
 
@@ -120,24 +121,37 @@ export class PowerpointWriter {
     imagePaths: Record<string, string>,
   ) {
     for (const part of parts) {
-      if (part.type === 'text') {
-        object.modifyElement(
-          { name: part.creationId, creationId: part.creationId },
-          setSingleLineText(this.#theme, part.text),
-        )
-      } else if (part.type === 'textBlock') {
-        object.modifyElement(
-          { name: part.creationId, creationId: part.creationId },
-          setTextBlock(this.#theme, part.lines),
-        )
-      } else {
-        object.modifyElement(
-          { name: part.creationId, creationId: part.creationId },
-          ModifyImageHelper.setRelationTarget(imagePaths[part.path] as string) as (
-            element: XmlElement | undefined,
-            arg1: XmlElement | undefined,
-          ) => void,
-        )
+      switch (part.type) {
+        case 'text': {
+          object.modifyElement(
+            { name: part.creationId, creationId: part.creationId },
+            setSingleLineText(this.#theme, part.text),
+          )
+          break
+        }
+        case 'textBlock': {
+          object.modifyElement(
+            { name: part.creationId, creationId: part.creationId },
+            setTextBlock(this.#theme, part.lines),
+          )
+          break
+        }
+        case 'codeBlock': {
+          object.modifyElement(
+            { name: part.creationId, creationId: part.creationId },
+            highlightCode(this.#theme, part.language, part.code),
+          )
+          break
+        }
+        default: {
+          object.modifyElement(
+            { name: part.creationId, creationId: part.creationId },
+            ModifyImageHelper.setRelationTarget(imagePaths[part.path] as string) as (
+              element: XmlElement | undefined,
+              arg1: XmlElement | undefined,
+            ) => void,
+          )
+        }
       }
 
       // object.removeElement({ name: part.creationId, creationId: part.creationId })

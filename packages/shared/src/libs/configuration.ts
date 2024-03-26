@@ -58,9 +58,17 @@ export const TemplateConfigurationSchema = z
       .strict(),
     theme: z
       .object({
-        font: z.object({
-          monospace: z.string(),
-        }),
+        font: z
+          .object({
+            monospace: z.string(),
+          })
+          .strict(),
+        color: z.record(z.string()),
+        size: z
+          .object({
+            codeLines: z.number(),
+          })
+          .strict(),
       })
       .strict(),
     layout: z

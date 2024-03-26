@@ -1,4 +1,4 @@
-import type { TemplateElementDefinition, TemplateDefinition } from '@markpoint/shared'
+import type { TemplateElementDefinition, TemplateDefinition, CodeLanguage } from '@markpoint/shared'
 
 export interface PresentationMetadata {
   title: string
@@ -12,11 +12,9 @@ export interface PowerpointLinePartContent {
   text: string
 }
 
-export type PowerpointCodeLanguage = 'json' | 'yaml'
-
 export interface PowerpointCodePartContent {
   type: 'code'
-  language: PowerpointCodeLanguage
+  language: CodeLanguage
   code: string
 }
 

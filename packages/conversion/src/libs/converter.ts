@@ -1,4 +1,5 @@
 import type {
+  MarkdownCodeContent,
   MarkdownMixedContent,
   MarkdownPresentation,
   MarkdownSection,
@@ -73,15 +74,29 @@ function convertElementConfigurationToDefinition(
         }
       }
       if (elementConfiguration.reference === 'content') {
-        return {
-          creationId: elementConfiguration.creationId,
-          type: 'textBlock',
-          lines: data.part.content
-            .filter((mmc: MarkdownMixedContent): mmc is MarkdownTextContent => mmc.type === 'text')
-            .map((line: MarkdownTextContent) => ({
-              level: line.level,
-              text: line.text,
-            })),
+        if (data.part.content.every((c) => c.type === 'text')) {
+          return {
+            creationId: elementConfiguration.creationId,
+            type: 'textBlock',
+            lines: data.part.content
+              .filter((mmc: MarkdownMixedContent): mmc is MarkdownTextContent => mmc.type === 'text')
+              .map((line: MarkdownTextContent) => ({
+                level: line.level,
+                text: line.text,
+              })),
+          }
+        }
+        if (data.part.content.every((c) => c.type === 'code')) {
+          if (data.part.content.length !== 1) {
+            throw new Error('Only one code block is supported')
+          }
+          const codeContent = data.part.content[0] as MarkdownCodeContent
+          return {
+            creationId: elementConfiguration.creationId,
+            type: 'codeBlock',
+            language: codeContent.language,
+            code: codeContent.code,
+          }
         }
       }
     }
@@ -105,7 +120,11 @@ export class MarkpointConverter {
     presentation: MarkdownPresentation,
     outputFile: string,
   ): Promise<void> {
-    const theme = new PresentationTheme(templateConfiguration.theme.font)
+    const theme = new PresentationTheme(
+      templateConfiguration.theme.font,
+      templateConfiguration.theme.color,
+      templateConfiguration.theme.size,
+    )
     const powerpointWriter = new PowerpointWriter(theme)
 
     const documentTemplateData = {
@@ -143,18 +162,22 @@ export class MarkpointConverter {
         const content = sectionSlide.content
 
         const uniqueContentTypes = [...new Set(content.map((c) => c.type))].sort()
-        if (uniqueContentTypes.length === 1 && uniqueContentTypes[0] === 'text') {
-          // Section with full text content
-          const layout = templateConfiguration.layout.content.text
-          if (!layout) {
-            throw new Error('No layout for text content')
+        if (uniqueContentTypes.length === 1) {
+          if (uniqueContentTypes[0] === 'text' || uniqueContentTypes[0] === 'code') {
+            // Section with full text content
+            const layout = templateConfiguration.layout.content.text
+            if (!layout) {
+              throw new Error('No layout for text content')
+            }
+            slides.push({
+              layoutSlide: layout.baseSlideNumber,
+              content: layout.elements.map((e) =>
+                convertElementConfigurationToDefinition(e, { part: sectionSlide, section }),
+              ),
+            })
+          } else {
+            throw new Error(`Unsupported content type:${uniqueContentTypes[0]}`)
           }
-          slides.push({
-            layoutSlide: layout.baseSlideNumber,
-            content: layout.elements.map((e) =>
-              convertElementConfigurationToDefinition(e, { part: sectionSlide, section }),
-            ),
-          })
         } else {
           console.error('Unsupported content types:', uniqueContentTypes)
         }

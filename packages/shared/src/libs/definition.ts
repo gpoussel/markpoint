@@ -1,3 +1,4 @@
+import type { CodeLanguage } from './code.js'
 import type { ListLevel, SingleLineText } from './text.js'
 
 export interface TemplateDefinition {
@@ -17,6 +18,7 @@ export type TemplateElementDefinition =
   | TemplateTextElementDefinition
   | TemplatePictureElementDefinition
   | TemplateTextBlockElementDefinition
+  | TemplateCodeBlockElementDefinition
 
 interface BaseTemplateElementDefinition {
   creationId: string
@@ -33,6 +35,12 @@ export interface TemplateTextBlockElementDefinition extends BaseTemplateElementD
     level: ListLevel
     text: SingleLineText
   }[]
+}
+
+export interface TemplateCodeBlockElementDefinition extends BaseTemplateElementDefinition {
+  type: 'codeBlock'
+  language: CodeLanguage
+  code: string
 }
 
 export interface TemplatePictureElementDefinition extends BaseTemplateElementDefinition {

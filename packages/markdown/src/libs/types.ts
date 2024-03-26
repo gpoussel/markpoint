@@ -1,4 +1,4 @@
-import type { ListLevel, SingleLineText } from '@markpoint/shared'
+import type { ListLevel, SingleLineText, CodeLanguage } from '@markpoint/shared'
 import z from 'zod'
 
 export interface MarkdownPresentation {
@@ -21,11 +21,9 @@ export interface MarkdownSlide {
   content: MarkdownMixedContent[]
 }
 
-export type MarkdownCodeLanguage = 'yaml' | 'json' | 'text'
-
 export interface MarkdownCodeContent {
   type: 'code'
-  language: MarkdownCodeLanguage
+  language: CodeLanguage
   code: string
 }
 

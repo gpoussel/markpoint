@@ -1,13 +1,7 @@
-import type { ListLevel, SingleLineText } from '@markpoint/shared'
+import type { CodeLanguage, ListLevel, SingleLineText } from '@markpoint/shared'
 import type { Root, PhrasingContent, Paragraph, RootContent, List, ThematicBreak, Heading } from 'mdast'
 
-import type {
-  MarkdownCodeLanguage,
-  MarkdownMixedContent,
-  MarkdownSection,
-  MarkdownSlide,
-  MarkdownTextContent,
-} from './types.js'
+import type { MarkdownMixedContent, MarkdownSection, MarkdownSlide, MarkdownTextContent } from './types.js'
 import { splitParts } from './utils.js'
 
 interface TextPartStyle {
@@ -87,7 +81,7 @@ function convertContentToSlideContent(node: RootContent, level: ListLevel = 0): 
     ]
   }
   if (node.type === 'code') {
-    let language: MarkdownCodeLanguage | undefined
+    let language: CodeLanguage | undefined
     switch (node.lang) {
       case 'yaml':
       case 'yml': {
