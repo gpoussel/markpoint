@@ -1,0 +1,27 @@
+diff --git a/dist/WorkspaceWorker.js b/dist/WorkspaceWorker.js
+index 472f0ac73b3e1bf25e3a42937781c1ed9a9cefe0..e0499613316fb1fdd4e04b49414e6b6d3e8d0273 100644
+--- a/dist/WorkspaceWorker.js
++++ b/dist/WorkspaceWorker.js
+@@ -196,11 +196,11 @@ export class WorkspaceWorker {
+                         if (config) {
+                             if (hasResolveEntryPaths) {
+                                 const dependencies = await plugin.resolveEntryPaths(config, opts);
+-                                dependencies.forEach(id => configEntryPaths.push(id));
++                                dependencies.filter(d => d !== null).forEach(id => configEntryPaths.push(id));
+                             }
+                             if (shouldRunConfigResolver) {
+                                 const dependencies = await plugin.resolveConfig(config, opts);
+-                                dependencies.forEach(id => addDependency(id, configFilePath));
++                                dependencies.filter(d => d !== null).forEach(id => addDependency(id, configFilePath));
+                             }
+                         }
+                     }
+@@ -209,7 +209,7 @@ export class WorkspaceWorker {
+                 finalEntryPaths.forEach(id => addDependency(id));
+                 if (hasResolve) {
+                     const dependencies = await plugin.resolve(options);
+-                    dependencies.forEach(id => addDependency(id, join(cwd, 'package.json')));
++                    dependencies.filter(d => d !== null).forEach(id => addDependency(id, join(cwd, 'package.json')));
+                 }
+                 debugLogArray([name, plugin.title], 'dependencies', pluginDependencies);
+             }
