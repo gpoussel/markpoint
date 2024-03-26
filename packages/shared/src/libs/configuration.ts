@@ -64,11 +64,6 @@ export const TemplateConfigurationSchema = z
           })
           .strict(),
         color: z.record(z.string()),
-        size: z
-          .object({
-            codeLines: z.number(),
-          })
-          .strict(),
       })
       .strict(),
     layout: z

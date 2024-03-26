@@ -217,9 +217,6 @@ export async function samplePowerpointGeneration(templatePath: string, outputPat
         monospace: 'Courier New',
       },
       {},
-      {
-        codeLines: 10,
-      },
     ),
   )
   await writer.generate(templatePath, configuration, outputPath)

@@ -120,11 +120,7 @@ export class MarkpointConverter {
     presentation: MarkdownPresentation,
     outputFile: string,
   ): Promise<void> {
-    const theme = new PresentationTheme(
-      templateConfiguration.theme.font,
-      templateConfiguration.theme.color,
-      templateConfiguration.theme.size,
-    )
+    const theme = new PresentationTheme(templateConfiguration.theme.font, templateConfiguration.theme.color)
     const powerpointWriter = new PowerpointWriter(theme)
 
     const documentTemplateData = {
