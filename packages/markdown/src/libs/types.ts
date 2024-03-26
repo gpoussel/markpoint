@@ -1,4 +1,4 @@
-import type { SingleLineText } from '@markpoint/shared'
+import type { ListLevel, SingleLineText } from '@markpoint/shared'
 import z from 'zod'
 
 export interface MarkdownPresentation {
@@ -29,11 +29,9 @@ export interface MarkdownCodeContent {
   code: string
 }
 
-export type MarkdownListLevel = 0 | 1 | 2 | 3 | 4
-
 export interface MarkdownTextContent {
   type: 'text'
-  level: MarkdownListLevel
+  level: ListLevel
   text: SingleLineText
 }
 

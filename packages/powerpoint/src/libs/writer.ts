@@ -11,7 +11,7 @@ import type {
   PowerpointPresentationDefinition,
   PresentationMetadata,
 } from './generation/configuration.js'
-import { setSingleLineText } from './generation/text.js'
+import { setSingleLineText, setTextBlock } from './generation/text.js'
 
 const pptx = new PPTX.Composer()
 
@@ -116,6 +116,8 @@ export class PowerpointWriter {
     for (const part of parts) {
       if (part.type === 'text') {
         object.modifyElement({ name: part.creationId, creationId: part.creationId }, setSingleLineText(part.text))
+      } else if (part.type === 'textBlock') {
+        object.modifyElement({ name: part.creationId, creationId: part.creationId }, setTextBlock(part.lines))
       } else {
         object.modifyElement(
           { name: part.creationId, creationId: part.creationId },

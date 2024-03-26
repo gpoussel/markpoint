@@ -1,4 +1,10 @@
-import type { MarkdownPresentation, MarkdownSection, MarkdownSlide } from '@markpoint/markdown'
+import type {
+  MarkdownMixedContent,
+  MarkdownPresentation,
+  MarkdownSection,
+  MarkdownSlide,
+  MarkdownTextContent,
+} from '@markpoint/markdown'
 import { PowerpointWriter, type PowerpointSlidesConfiguration } from '@markpoint/powerpoint'
 import {
   StringUtils,
@@ -59,28 +65,24 @@ function convertElementConfigurationToDefinition(
         text: textLine,
       }
     } else if (data.section && data.part) {
-      let textLine: SingleLineText
-      switch (elementConfiguration.reference) {
-        case 'title': {
-          textLine = data.section.title
-          break
-        }
-        case 'subtitle': {
-          textLine = data.part.title ?? []
-          break
-        }
-        case 'content': {
-          textLine = [] // TODO: Implement content extraction
-          break
-        }
-        default: {
-          throw new Error(`Unsupported content reference`)
+      if (elementConfiguration.reference === 'title' || elementConfiguration.reference === 'subtitle') {
+        return {
+          creationId: elementConfiguration.creationId,
+          type: 'text',
+          text: elementConfiguration.reference === 'title' ? data.section.title : data.part.title ?? [],
         }
       }
-      return {
-        creationId: elementConfiguration.creationId,
-        type: 'text',
-        text: textLine,
+      if (elementConfiguration.reference === 'content') {
+        return {
+          creationId: elementConfiguration.creationId,
+          type: 'textBlock',
+          lines: data.part.content
+            .filter((mmc: MarkdownMixedContent): mmc is MarkdownTextContent => mmc.type === 'text')
+            .map((line: MarkdownTextContent) => ({
+              level: line.level,
+              text: line.text,
+            })),
+        }
       }
     }
   }

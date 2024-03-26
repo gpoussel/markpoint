@@ -1,9 +1,8 @@
-import type { SingleLineText } from '@markpoint/shared'
+import type { ListLevel, SingleLineText } from '@markpoint/shared'
 import type { Root, PhrasingContent, Paragraph, RootContent, List, ThematicBreak, Heading } from 'mdast'
 
 import type {
   MarkdownCodeLanguage,
-  MarkdownListLevel,
   MarkdownMixedContent,
   MarkdownSection,
   MarkdownSlide,
@@ -49,7 +48,7 @@ function convertContentToTextPart(
   })
 }
 
-function convertListToSlideContent(node: List, level: MarkdownListLevel = 0): MarkdownTextContent[] {
+function convertListToSlideContent(node: List, level: ListLevel = 0): MarkdownTextContent[] {
   return node.children.flatMap((listItem) => {
     const textContents: MarkdownTextContent[] = []
     for (const child of listItem.children) {
@@ -65,7 +64,7 @@ function convertListToSlideContent(node: List, level: MarkdownListLevel = 0): Ma
             `Markdown error: list level cannot be greater than 4 at line ${listItem.position?.start.line}`,
           )
         }
-        textContents.push(...convertListToSlideContent(child, (level + 1) as MarkdownListLevel))
+        textContents.push(...convertListToSlideContent(child, (level + 1) as ListLevel))
       } else {
         throw new Error(
           `Markdown error: unsupported list item child type: ${child.type} at line ${child.position?.start.line}`,
@@ -77,7 +76,7 @@ function convertListToSlideContent(node: List, level: MarkdownListLevel = 0): Ma
   })
 }
 
-function convertContentToSlideContent(node: RootContent, level: MarkdownListLevel = 0): MarkdownMixedContent[] {
+function convertContentToSlideContent(node: RootContent, level: ListLevel = 0): MarkdownMixedContent[] {
   if (node.type === 'paragraph') {
     return [
       {
@@ -118,7 +117,7 @@ function convertContentToSlideContent(node: RootContent, level: MarkdownListLeve
     ]
   }
   if (node.type === 'list') {
-    return convertListToSlideContent(node, (level + 1) as MarkdownListLevel)
+    return convertListToSlideContent(node, (level + 1) as ListLevel)
   }
   throw new Error(`Markdown error: unsupported node type: ${node.type} at line ${node.position?.start.line}`)
 }

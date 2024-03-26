@@ -6,3 +6,5 @@ export interface TextPart {
 }
 
 export type SingleLineText = TextPart[]
+
+export type ListLevel = 0 | 1 | 2 | 3 | 4

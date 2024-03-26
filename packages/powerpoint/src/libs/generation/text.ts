@@ -1,9 +1,9 @@
 /* eslint-disable unicorn/prefer-dom-node-append */
-import type { SingleLineText, TextPart } from '@markpoint/shared'
+import type { SingleLineText, TemplateTextBlockElementDefinition, TextPart } from '@markpoint/shared'
 import type { ShapeModificationCallback, XmlElement } from 'pptx-automizer'
 
 import { ELEMENT_TAG_NAMES } from '../opendocument.js'
-import { createParagraph, createTextNode } from '../utils/pptx-utils.js'
+import { createParagraph, createParagraphProperties, createTextNode } from '../utils/pptx-utils.js'
 import { getElementByTagNameRecursive, getOrCreateChild, removeAllNamedChild } from '../utils/xml-utils.js'
 
 function createRange(document: Document, textPart: TextPart, existingRangeProperties: Element | undefined): Node {
@@ -27,18 +27,49 @@ function createRange(document: Document, textPart: TextPart, existingRangeProper
   return range
 }
 
+function cleanupContent(element: XmlElement): { rangeProperties: Element | undefined; textBody: Element | undefined } {
+  const textBody = getElementByTagNameRecursive(element, ELEMENT_TAG_NAMES.shapeTextBody)
+  if (!textBody) {
+    return { rangeProperties: undefined, textBody: undefined }
+  }
+  const existingRangeProperties = getElementByTagNameRecursive(element, ELEMENT_TAG_NAMES.rangeProperties)
+  removeAllNamedChild(textBody, ELEMENT_TAG_NAMES.paragraph)
+  return { rangeProperties: existingRangeProperties, textBody }
+}
+
 export function setSingleLineText(singleLineText: SingleLineText): ShapeModificationCallback {
   return (element: XmlElement) => {
-    const textBody = getElementByTagNameRecursive(element, ELEMENT_TAG_NAMES.shapeTextBody)
+    const { rangeProperties, textBody } = cleanupContent(element)
     if (!textBody) {
       return
     }
-    const existingRangeProperties = getElementByTagNameRecursive(element, ELEMENT_TAG_NAMES.rangeProperties)
-    removeAllNamedChild(textBody, ELEMENT_TAG_NAMES.paragraph)
     const paragraphElement = createParagraph(element.ownerDocument)
     for (const textPart of singleLineText) {
-      paragraphElement.appendChild(createRange(element.ownerDocument, textPart, existingRangeProperties))
+      paragraphElement.appendChild(createRange(element.ownerDocument, textPart, rangeProperties))
     }
     textBody.appendChild(paragraphElement)
+  }
+}
+
+export function setTextBlock(textLines: TemplateTextBlockElementDefinition['lines']): ShapeModificationCallback {
+  return (element: XmlElement) => {
+    const { rangeProperties, textBody } = cleanupContent(element)
+    if (!textBody) {
+      return
+    }
+    if (textLines.length === 0) {
+      // We cannot have an empty shape (i.e. without paragraph) in PowerPoint
+      const paragraphElement = createParagraph(element.ownerDocument)
+      textBody.appendChild(paragraphElement)
+      return
+    }
+    for (const line of textLines) {
+      const paragraphElement = createParagraph(element.ownerDocument)
+      paragraphElement.appendChild(createParagraphProperties(element.ownerDocument, line.level))
+      for (const textPart of line.text) {
+        paragraphElement.appendChild(createRange(element.ownerDocument, textPart, rangeProperties))
+      }
+      textBody.appendChild(paragraphElement)
+    }
   }
 }
