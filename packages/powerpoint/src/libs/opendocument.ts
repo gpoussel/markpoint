@@ -85,3 +85,7 @@ export function pointsToEmu(points: number) {
 export function emuToPoints(emu: number | string | undefined | null) {
   return (toNumber(emu) / EMU_PER_CENTIMETER / 2.54) * DOT_PER_INCH
 }
+
+export function pointsToHundredPoints(points: number) {
+  return points * 100
+}

@@ -4,7 +4,13 @@ import type { Comment as CommentHast, Doctype as DoctypeHast, Element as Element
 import { common, createLowlight } from 'lowlight'
 import type { ShapeModificationCallback, XmlElement } from 'pptx-automizer'
 
-import { ATTRIBUTE_NAMES, ELEMENT_TAG_NAMES, centimetersToEmu, emuToPoints } from '../opendocument.js'
+import {
+  ATTRIBUTE_NAMES,
+  ELEMENT_TAG_NAMES,
+  centimetersToEmu,
+  emuToPoints,
+  pointsToHundredPoints,
+} from '../opendocument.js'
 import type { PresentationTheme } from '../theme.js'
 import { createParagraph, createTextNode } from '../utils/pptx-utils.js'
 import {
@@ -15,6 +21,10 @@ import {
 } from '../utils/xml-utils.js'
 
 import { computeTextFitOptions } from './sizing.js'
+
+const PARAGRAPH_MARGIN_POINTS = 2
+const PARAGRAPH_FONT_SIZE_POINTS = 14
+const INSET_EMU = centimetersToEmu(0.25)
 
 const lowlight = createLowlight(common)
 
@@ -43,7 +53,7 @@ function createRange(theme: PresentationTheme, document: Document, text: string,
 
   const rangeProperties = document.createElement(ELEMENT_TAG_NAMES.rangeProperties)
   rangeProperties.setAttribute('lang', 'en-US')
-  rangeProperties.setAttribute('sz', '1400')
+  rangeProperties.setAttribute('sz', pointsToHundredPoints(PARAGRAPH_FONT_SIZE_POINTS).toString())
   rangeProperties.setAttribute('dirty', '0')
   const color = theme.color[`code.${kind}`] ?? theme.color[`code.default`]
   if (color) {
@@ -128,16 +138,13 @@ export function highlightCode(
     removeAllNamedChild(textBody, ELEMENT_TAG_NAMES.paragraph)
 
     const bodyProperties = getOrCreateChild(element, ELEMENT_TAG_NAMES.bodyProperties)
-    const insetHeightEmu = centimetersToEmu(0.25)
     for (const dir of ['lIns', 'tIns', 'rIns', 'bIns']) {
-      bodyProperties.setAttribute(dir, insetHeightEmu.toString())
+      bodyProperties.setAttribute(dir, INSET_EMU.toString())
     }
     bodyProperties.setAttribute('anchor', 't')
     bodyProperties.setAttribute('anchorCtr', '0')
     removeAllChild(bodyProperties)
     const codeLines = countCodeLines(code)
-
-    const paragraphMarginPoints = 2
     const extentTag = getElementByTagNameRecursive(
       shapeProperties,
       ELEMENT_TAG_NAMES.transform,
@@ -145,12 +152,12 @@ export function highlightCode(
     )
     if (extentTag) {
       const shapeHeightEmu = Number.parseInt(extentTag.getAttribute('cy') as string)
-      const availableTextHeightPoints = emuToPoints(shapeHeightEmu - 2 * insetHeightEmu)
+      const availableTextHeightPoints = emuToPoints(shapeHeightEmu - 2 * INSET_EMU)
       const textFitOptions = computeTextFitOptions(
         codeLines,
-        14 /* TODO: Auto detect */,
+        PARAGRAPH_FONT_SIZE_POINTS,
         availableTextHeightPoints,
-        paragraphMarginPoints,
+        PARAGRAPH_MARGIN_POINTS,
       )
       const normAutoFit = element.ownerDocument.createElement(ELEMENT_TAG_NAMES.normalizedAutoFit)
       if (textFitOptions.fontScale) {
@@ -194,7 +201,7 @@ export function highlightCode(
       for (const dir of [ELEMENT_TAG_NAMES.spacingBefore, ELEMENT_TAG_NAMES.spacingAfter]) {
         const spacing = element.ownerDocument.createElement(dir)
         const spacingValue = element.ownerDocument.createElement(ELEMENT_TAG_NAMES.spacingPoints)
-        spacingValue.setAttribute(ATTRIBUTE_NAMES.val, (paragraphMarginPoints * 100).toString())
+        spacingValue.setAttribute(ATTRIBUTE_NAMES.val, pointsToHundredPoints(PARAGRAPH_MARGIN_POINTS).toString())
         spacing.appendChild(spacingValue)
         paragraphProperties.appendChild(spacing)
       }
