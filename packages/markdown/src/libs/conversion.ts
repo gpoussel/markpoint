@@ -156,17 +156,30 @@ export function convertMarkdownSections(root: Root): MarkdownSection[] {
       }
 
       for (const heading3Part of heading3Parts.parts) {
-        const slideTitle = convertContentToTextPart(heading3Part.splitter.children)
+        const genericSlideTitle = convertContentToTextPart(heading3Part.splitter.children)
         const slideParts = splitParts(
           heading3Part.subparts,
           (node): node is ThematicBreak => node.type === 'thematicBreak',
         )
         const slidesContent = [slideParts.initialParts, ...slideParts.parts.map((sp) => sp.subparts)]
+        const totalNumberOfSlides = slidesContent.length
+        let i = 1
         for (const slideContent of slidesContent) {
+          const slideTitle: SingleLineText =
+            totalNumberOfSlides > 1
+              ? [
+                  ...genericSlideTitle,
+                  {
+                    text: ` (${i}/${totalNumberOfSlides})`,
+                    ...DEFAULT_TEXT_PART_STYLE,
+                  },
+                ]
+              : genericSlideTitle
           slides.push({
             title: slideTitle,
             content: slideContent.flatMap((slideContentEntry) => convertContentToSlideContent(slideContentEntry)),
           })
+          ++i
         }
       }
     }
