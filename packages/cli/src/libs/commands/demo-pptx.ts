@@ -49,7 +49,7 @@ const template: TemplateDefinition = {
           creationId: '{4F2608E1-5E03-2C7E-434E-5BF07E81F24A}',
           text: [{ text: '??', bold: false, italic: false, monospace: false }],
         },
-        { type: 'picture', creationId: '{7B4224E4-95EA-4DE2-B734-333DC4BF7A4F}', path: '??' },
+        { type: 'picture', creationId: '{7B4224E4-95EA-4DE2-B734-333DC4BF7A4F}', path: '??', alt: '??' },
       ],
     },
     {

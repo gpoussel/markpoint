@@ -33,7 +33,13 @@ export interface MarkdownTextContent {
   text: SingleLineText
 }
 
-export type MarkdownMixedContent = MarkdownCodeContent | MarkdownTextContent
+export interface MarkdownImageContent {
+  type: 'image'
+  path: string
+  alt: string | undefined
+}
+
+export type MarkdownMixedContent = MarkdownCodeContent | MarkdownTextContent | MarkdownImageContent
 
 export const FrontmatterObjectType = z.object({
   company: z.string().optional(),

@@ -3,79 +3,84 @@
 exports[`TemplateConfigurationReader > readConfiguration > should read the valid/simple.yml configuration file and return the parsed content 1`] = `
 {
   "baseFile": "../example.pptx",
-  "layouts": [
-    {
-      "baseSlideNumber": 4,
-      "elements": [
-        {
-          "creationId": "{6D871570-FBB8-F282-1B97-65C16AE6C6F4}",
-          "name": "title",
-          "type": "line",
-        },
-        {
-          "creationId": "{4F18DD32-924E-CE9C-91B0-4F30CCE1B6F9}",
-          "name": "subtitle",
-          "type": "line",
-        },
-      ],
-      "name": "title",
+  "layout": {
+    "content": {
+      "text": {
+        "baseSlideNumber": 21,
+        "elements": [
+          {
+            "creationId": "{4582957B-1559-50B8-87D1-3F29F9DD12B2}",
+            "reference": "title",
+            "type": "content",
+          },
+          {
+            "creationId": "{28862325-59A6-26E6-FB10-93F6B61575F0}",
+            "reference": "subtitle",
+            "type": "content",
+          },
+          {
+            "creationId": "{0984FDF1-E23B-9E8F-73B5-6BF495603FA0}",
+            "reference": "content",
+            "type": "content",
+          },
+        ],
+      },
     },
-    {
-      "baseSlideNumber": 24,
-      "elements": [
-        {
-          "creationId": "{05383CED-A871-D722-5C38-FDB6D14AA784}",
-          "name": "title",
-          "type": "line",
-        },
-        {
-          "creationId": "{4F2608E1-5E03-2C7E-434E-5BF07E81F24A}",
-          "name": "subtitle",
-          "type": "line",
-        },
-        {
-          "creationId": "{7B4224E4-95EA-4DE2-B734-333DC4BF7A4F}",
-          "name": "background",
-          "type": "picture",
-        },
-      ],
-      "name": "sectionTitle",
+    "document": {
+      "first": {
+        "baseSlideNumber": 4,
+        "elements": [
+          {
+            "creationId": "{6D871570-FBB8-F282-1B97-65C16AE6C6F4}",
+            "template": "{title}",
+            "type": "text",
+          },
+          {
+            "creationId": "{4F18DD32-924E-CE9C-91B0-4F30CCE1B6F9}",
+            "template": "Reference: {reference} – Issue {issue} | {location}, {date}",
+            "type": "text",
+          },
+        ],
+      },
+      "last": {
+        "baseSlideNumber": 63,
+        "elements": [],
+      },
     },
-    {
-      "baseSlideNumber": 21,
-      "elements": [
-        {
-          "creationId": "{4582957B-1559-50B8-87D1-3F29F9DD12B2}",
-          "name": "title",
-          "type": "line",
-        },
-        {
-          "creationId": "{28862325-59A6-26E6-FB10-93F6B61575F0}",
-          "name": "subtitle",
-          "type": "line",
-        },
-        {
-          "creationId": "{0984FDF1-E23B-9E8F-73B5-6BF495603FA0}",
-          "name": "content",
-          "type": "text",
-        },
-      ],
-      "name": "contentSlide",
+    "section": {
+      "first": {
+        "baseSlideNumber": 24,
+        "elements": [
+          {
+            "creationId": "{05383CED-A871-D722-5C38-FDB6D14AA784}",
+            "reference": "title",
+            "type": "content",
+          },
+          {
+            "creationId": "{4F2608E1-5E03-2C7E-434E-5BF07E81F24A}",
+            "reference": "summary",
+            "type": "content",
+          },
+        ],
+      },
     },
-    {
-      "baseSlideNumber": 63,
-      "elements": [],
-      "name": "end",
-    },
-  ],
+  },
   "master": {
     "elements": [
       {
         "creationId": "{62086BA9-1591-C6CD-E573-A5F8961683B1}",
-        "name": "footer",
-        "type": "line",
+        "template": "{title} | {company} | {date}",
+        "type": "text",
       },
     ],
+  },
+  "theme": {
+    "color": {
+      "code.default": "C5C8C6",
+    },
+    "font": {
+      "monospace": "Fira Code",
+    },
   },
 }
 `;

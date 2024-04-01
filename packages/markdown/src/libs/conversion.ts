@@ -72,6 +72,18 @@ function convertListToSlideContent(node: List, level: ListLevel = 0): MarkdownTe
 
 function convertContentToSlideContent(node: RootContent, level: ListLevel = 0): MarkdownMixedContent[] {
   if (node.type === 'paragraph') {
+    if (node.children.length === 1) {
+      const firstChild = node.children[0] as PhrasingContent
+      if (firstChild.type === 'image') {
+        return [
+          {
+            type: 'image',
+            path: firstChild.url,
+            alt: firstChild.alt ?? undefined,
+          },
+        ]
+      }
+    }
     return [
       {
         type: 'text',

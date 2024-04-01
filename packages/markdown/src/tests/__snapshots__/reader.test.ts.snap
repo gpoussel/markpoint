@@ -493,6 +493,13 @@ exports[`MarkdownReader > read > should read the valid/separator.md markdown fil
               "text": "Section 1 - Code",
               "url": undefined,
             },
+            {
+              "bold": false,
+              "italic": false,
+              "monospace": false,
+              "text": " (1/2)",
+              "url": undefined,
+            },
           ],
         },
         {
@@ -509,6 +516,13 @@ exports[`MarkdownReader > read > should read the valid/separator.md markdown fil
               "italic": false,
               "monospace": false,
               "text": "Section 1 - Code",
+              "url": undefined,
+            },
+            {
+              "bold": false,
+              "italic": false,
+              "monospace": false,
+              "text": " (2/2)",
               "url": undefined,
             },
           ],

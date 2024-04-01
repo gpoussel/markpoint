@@ -46,4 +46,5 @@ export interface TemplateCodeBlockElementDefinition extends BaseTemplateElementD
 export interface TemplatePictureElementDefinition extends BaseTemplateElementDefinition {
   type: 'picture'
   path: string
+  alt: string | undefined
 }

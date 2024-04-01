@@ -1,5 +1,6 @@
 import type {
   MarkdownCodeContent,
+  MarkdownImageContent,
   MarkdownMixedContent,
   MarkdownPresentation,
   MarkdownSection,
@@ -98,6 +99,18 @@ function convertElementConfigurationToDefinition(
             code: codeContent.code,
           }
         }
+        if (data.part.content.every((c) => c.type === 'image')) {
+          if (data.part.content.length !== 1) {
+            throw new Error('Only one image is supported')
+          }
+          const image = data.part.content[0] as MarkdownImageContent
+          return {
+            creationId: elementConfiguration.creationId,
+            type: 'picture',
+            alt: image.alt,
+            path: image.path,
+          }
+        }
       }
     }
   }
@@ -154,26 +167,21 @@ export class MarkpointConverter {
       }
 
       for (const sectionSlide of section.slides) {
-        // const title = sectionSlide.title
         const content = sectionSlide.content
 
         const uniqueContentTypes = [...new Set(content.map((c) => c.type))].sort()
         if (uniqueContentTypes.length === 1) {
-          if (uniqueContentTypes[0] === 'text' || uniqueContentTypes[0] === 'code') {
-            // Section with full text content
-            const layout = templateConfiguration.layout.content.text
-            if (!layout) {
-              throw new Error('No layout for text content')
-            }
-            slides.push({
-              layoutSlide: layout.baseSlideNumber,
-              content: layout.elements.map((e) =>
-                convertElementConfigurationToDefinition(e, { part: sectionSlide, section }),
-              ),
-            })
-          } else {
-            throw new Error(`Unsupported content type:${uniqueContentTypes[0]}`)
+          // Section with full text content
+          const layout = templateConfiguration.layout.content.text
+          if (!layout) {
+            throw new Error('No layout for text content')
           }
+          slides.push({
+            layoutSlide: layout.baseSlideNumber,
+            content: layout.elements.map((e) =>
+              convertElementConfigurationToDefinition(e, { part: sectionSlide, section }),
+            ),
+          })
         } else {
           console.error('Unsupported content types:', uniqueContentTypes)
         }
